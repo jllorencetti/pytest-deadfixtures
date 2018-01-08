@@ -1,6 +1,12 @@
 Changelog
 ---------
 
+0.2.2
+~~~~~
+
+* Remove docs folder, the README file should be enough
+* Fix typo in README
+
 0.2.1
 ~~~~~
 

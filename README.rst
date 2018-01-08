@@ -37,7 +37,7 @@ Just run 'pytest' with an extra option '--dead-fixtures'::
 
     ========================= no tests ran in 0.00 seconds =========================
 
-Using some level of verbosity will also print the doc string of each fixture::
+Using some level of verbosity will also print the docstring of each fixture::
 
     $ pytest --dead-fixtures -v
     ============================= test session starts ==============================
