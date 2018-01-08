@@ -149,3 +149,23 @@ def test_dont_list_decorator_usefixtures(testdir, message_template):
 
     assert result.ret == 0
     assert message not in result.stdout.str()
+
+
+def test_write_docs_when_verbose(testdir):
+    testdir.makepyfile("""
+        import pytest
+
+
+        @pytest.fixture()
+        def some_fixture():
+            '''Blabla fixture docs'''
+            return 1
+
+
+        def test_simple():
+            assert 1 == 1
+    """)
+
+    result = testdir.runpytest('--dead-fixtures', '-v')
+
+    assert 'Blabla fixture docs' in result.stdout.str()

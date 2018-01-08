@@ -1,6 +1,10 @@
-import os
 import codecs
-from setuptools import setup
+import os
+import re
+
+from setuptools import setup, Command
+
+BASE_PATH = os.path.abspath(os.path.dirname(__file__))
 
 
 def read(fname):
@@ -8,21 +12,49 @@ def read(fname):
     return codecs.open(file_path, encoding='utf-8').read()
 
 
+def get_version():
+    changes_path = os.path.join(BASE_PATH, "CHANGES.rst")
+    regex = r'^#*\s*(?P<version>[0-9]+\.[0-9]+(\.[0-9]+)?)$'
+    with open(changes_path, encoding='utf-8') as changes_file:
+        for line in changes_file:
+            res = re.match(regex, line)
+            if res:
+                return res.group('version')
+    return '0.0.0'
+
+
+version = get_version()
+
+
+class VersionCommand(Command):
+    description = 'print current library version'
+    user_options = []
+
+    def initialize_options(self):
+        pass
+
+    def finalize_options(self):
+        pass
+
+    def run(self):
+        print(version)
+
+
 setup(
     name='pytest-deadfixtures',
-    version='0.1.0',
+    version=version,
     author='João Luiz Lorencetti',
     author_email='me@dirtycoder.net',
     maintainer='João Luiz Lorencetti',
     maintainer_email='me@dirtycoder.net',
     license='MIT',
-    url='https://github.com/dirtycoder/pytest-deadfixtures',
+    url='https://github.com/jllorencetti/pytest-deadfixtures',
     description='A simple plugin to list unused fixtures in pytest',
     long_description=read('README.rst'),
     py_modules=['pytest_deadfixtures'],
-    install_requires=['pytest>=3.1.1'],
+    install_requires=['pytest>=3.0.0'],
     classifiers=[
-        'Development Status :: 4 - Beta',
+        'Development Status :: 5 - Production/Stable',
         'Framework :: Pytest',
         'Intended Audience :: Developers',
         'Topic :: Software Development :: Testing',
@@ -35,6 +67,9 @@ setup(
         'Operating System :: OS Independent',
         'License :: OSI Approved :: MIT License',
     ],
+    cmdclass={
+        'version': VersionCommand,
+    },
     entry_points={
         'pytest11': [
             'deadfixtures = pytest_deadfixtures',

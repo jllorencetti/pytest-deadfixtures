@@ -4,7 +4,7 @@ site_author: João Luiz Lorencetti
 
 theme: readthedocs
 
-repo_url: https://github.com/dirtycoder/pytest-deadfixtures
+repo_url: https://github.com/jllorencetti/pytest-deadfixtures
 
 pages:
-- Home: index.md
+- Home: index.rst

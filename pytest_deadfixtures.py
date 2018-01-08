@@ -1,9 +1,14 @@
+"""
+Some functions are basically copy n' paste version of code already in pytest.
+Precisely the get_fixtures, get_used_fixturesdefs and write_docstring funtions.
+"""
+
 from collections import namedtuple
+from textwrap import dedent
 
 import _pytest.config
 import py
 from _pytest.compat import getlocation
-from _pytest.python import write_docstring
 
 AvailableFixture = namedtuple(
     'AvailableFixture',
@@ -86,18 +91,35 @@ def get_used_fixturesdefs(session):
     return fixturesdefs
 
 
-def write_fixtures(tw, fixtures):
+def write_docstring(tw, doc):
+    INDENT = "    "
+    doc = doc.rstrip()
+    if "\n" in doc:
+        firstline, rest = doc.split("\n", 1)
+    else:
+        firstline, rest = doc, ""
+
+    if firstline.strip():
+        tw.line(INDENT + firstline.strip())
+
+    if rest:
+        for line in dedent(rest).split("\n"):
+            tw.write(INDENT + line + "\n")
+
+
+def write_fixtures(tw, fixtures, write_docs):
     for fixture in fixtures:
         tplt = 'Fixture name: {}, location: {}'
-        tw.line(tplt.format(fixture.argname, fixture.relpath), green=True)
+        tw.line(tplt.format(fixture.argname, fixture.relpath))
         doc = fixture.fixturedef.func.__doc__ or ''
-        if doc:
+        if write_docs and doc:
             write_docstring(tw, doc)
 
 
 def show_dead_fixtures(config, session):
     session.perform_collect()
     tw = _pytest.config.create_terminal_writer(config)
+    verbose = config.getvalue('verbose')
 
     used_fixtures = get_used_fixturesdefs(session)
     available_fixtures = get_fixtures(session)
@@ -111,6 +133,6 @@ def show_dead_fixtures(config, session):
             'Hey there, I believe the following fixture(s) are not being used:',
             red=True
         )
-        write_fixtures(tw, unused_fixtures)
+        write_fixtures(tw, unused_fixtures, verbose)
     else:
         tw.line('Cool, every declared fixture are being used.', green=True)
