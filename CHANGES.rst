@@ -1,6 +1,11 @@
 Changelog
 ---------
 
+0.2.1
+~~~~~
+
+* Fix compatibility with pypy
+
 0.2.0
 ~~~~~
 
