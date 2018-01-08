@@ -13,7 +13,7 @@ def read(fname):
 
 
 def get_version():
-    changes_path = os.path.join(BASE_PATH, "CHANGES.rst")
+    changes_path = os.path.join(BASE_PATH, 'CHANGES.rst')
     regex = r'^#*\s*(?P<version>[0-9]+\.[0-9]+(\.[0-9]+)?)$'
     with open(changes_path, encoding='utf-8') as changes_file:
         for line in changes_file:
