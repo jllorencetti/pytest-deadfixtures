@@ -169,3 +169,37 @@ def test_write_docs_when_verbose(testdir):
     result = testdir.runpytest('--dead-fixtures', '-v')
 
     assert 'Blabla fixture docs' in result.stdout.str()
+
+
+def test_repeated_fixtures(testdir):
+    testdir.makepyfile("""
+        import pytest
+        
+        
+        class SomeClass:
+            a = 1
+            
+            def spam(self):
+                return 'and eggs'
+                
+        
+        @pytest.fixture()
+        def someclass_fixture():
+            return SomeClass()
+        
+        
+        @pytest.fixture()
+        def someclass_samefixture():
+            return SomeClass()
+        
+        
+        def test_simple(someclass_fixture):
+            assert 1 == 1
+        
+        def test_simple_again(someclass_samefixture):
+            assert 2 == 2
+    """)
+
+    result = testdir.runpytest('--dup-fixtures')
+
+    assert 'someclass_samefixture' in result.stdout.str()

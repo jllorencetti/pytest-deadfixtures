@@ -2,8 +2,8 @@
 Some functions are basically copy n' paste version of code already in pytest.
 Precisely the get_fixtures, get_used_fixturesdefs and write_docstring funtions.
 """
-
 from collections import namedtuple
+from itertools import combinations
 from textwrap import dedent
 
 import _pytest.config
@@ -15,6 +15,11 @@ AvailableFixture = namedtuple(
     'relpath, argname, fixturedef'
 )
 
+CachedFixture = namedtuple(
+    'CachedFixture',
+    'fixturedef, relpath, result'
+)
+
 
 def pytest_addoption(parser):
     group = parser.getgroup('deadfixtures')
@@ -24,6 +29,13 @@ def pytest_addoption(parser):
         dest='deadfixtures',
         default=False,
         help='Show fixtures not being used'
+    )
+    group.addoption(
+        '--dup-fixtures',
+        action='store_true',
+        dest='showrepeated',
+        default=False,
+        help='Show duplicated fixtures'
     )
 
 
@@ -114,6 +126,51 @@ def write_fixtures(tw, fixtures, write_docs):
         doc = fixture.fixturedef.func.__doc__ or ''
         if write_docs and doc:
             write_docstring(tw, doc)
+
+
+cached_fixtures = []
+
+
+def pytest_fixture_post_finalizer(fixturedef):
+    if hasattr(fixturedef, 'cached_result'):
+        curdir = py.path.local()
+        loc = getlocation(fixturedef.func, curdir)
+
+        cached_fixtures.append(
+            CachedFixture(
+                fixturedef,
+                curdir.bestrelpath(loc),
+                fixturedef.cached_result[0]
+            )
+        )
+
+
+def pytest_sessionfinish(session, exitstatus):
+    if exitstatus or not session.config.getvalue('showrepeated'):
+        return exitstatus
+
+    def result_same_type(a, b):
+        return isinstance(a.result, type(b.result))
+
+    def equal_result(a, b):
+        if not a.result or not b.result:
+            return False
+        if hasattr(a.result, '__dict__') or hasattr(b.result, '__dict__'):
+            return a.result.__dict__ == b.result.__dict__
+        return a.result == b.result
+
+    def same_loc(a, b):
+        return a.relpath == b.relpath
+
+    tw = _pytest.config.create_terminal_writer(session.config)
+
+    tw.line('\n\nBased on their return value, looks like you have some '
+            'duplicated fixtures:', red=True)
+    tplt = 'Fixture name: {}, location: {}'
+    for a, b in combinations(cached_fixtures, 2):
+        if result_same_type(a, b) and equal_result(a, b) and not same_loc(a, b):
+            tw.line(tplt.format(a.fixturedef.argname, a.relpath))
+            tw.line(tplt.format(b.fixturedef.argname, b.relpath))
 
 
 def show_dead_fixtures(config, session):

@@ -6,7 +6,7 @@ pytest-deadfixtures
     :target: https://travis-ci.org/jllorencetti/pytest-deadfixtures
     :alt: See Build Status on Travis CI
 
-A simple plugin to list unused fixtures in a pytest suite.
+A simple plugin to list unused or duplicated fixtures in a pytest suite.
 
 ----
 
@@ -14,6 +14,7 @@ Features
 --------
 
 * List unused fixtures in your tests
+* List duplicated fixtures
 
 
 Installation
@@ -25,6 +26,9 @@ You can install "pytest-deadfixtures" via `pip`_ from `PyPI`_::
 
 Usage
 -----
+
+Listing unused fixtures
+***********************
 
 Just run 'pytest' with an extra option '--dead-fixtures'::
 
@@ -48,6 +52,29 @@ Using some level of verbosity will also print the docstring of each fixture::
         Blabla fixture docs
 
     ========================= no tests ran in 0.00 seconds =========================
+
+Listing repeated fixtures
+*************************
+
+Now that you removed every unused fixture of your test suite, what if you want to go an extra mile?
+
+An important note about this is that it uses the fixture return value to verify if two or more fixtures are equal.
+
+This means **fixtures without a truthy return value will be skipped**.
+
+You should use this as a hint only, verify that the functionality provided by both fixtures are really repeated before deleting one of them.
+
+Just run 'pytest' with an extra option '--dup-fixtures', unlike the '--dead-fixtures' option, it'll normally run you tests::
+
+    $ pytest --dup-fixtures
+    ======================================================================================================================== test session starts ========================================================================================================================
+    (hidden for brevity)
+
+    tests/test_deadfixtures.py ........
+
+    Based on their return value, looks like you have some duplicated fixtures:
+    Fixture name: someclass_fixture, location: test_repeated_fixtures.py:12
+    Fixture name: someclass_samefixture, location: test_repeated_fixtures.py:17
 
 Contributing
 ------------
