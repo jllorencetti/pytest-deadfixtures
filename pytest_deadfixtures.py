@@ -164,8 +164,7 @@ def pytest_sessionfinish(session, exitstatus):
 
     tw = _pytest.config.create_terminal_writer(session.config)
 
-    tw.line('\n\nBased on their return value, looks like you have some '
-            'duplicated fixtures:', red=True)
+    tw.line('\n\nYou may have some duplicate fixtures:', red=True)
     tplt = 'Fixture name: {}, location: {}'
     for a, b in combinations(cached_fixtures, 2):
         if result_same_type(a, b) and equal_result(a, b) and not same_loc(a, b):
