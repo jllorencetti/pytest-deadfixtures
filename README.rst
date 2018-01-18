@@ -72,7 +72,7 @@ Just run 'pytest' with an extra option '--dup-fixtures', unlike the '--dead-fixt
 
     tests/test_deadfixtures.py ........
 
-    Based on their return value, looks like you have some duplicated fixtures:
+    You may have some duplicate fixtures:
     Fixture name: someclass_fixture, location: test_repeated_fixtures.py:12
     Fixture name: someclass_samefixture, location: test_repeated_fixtures.py:17
 
