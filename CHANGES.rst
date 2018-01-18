@@ -1,6 +1,11 @@
 Changelog
 ---------
 
+0.3.0
+~~~~~
+
+* Add an option to list duplicated fixtures
+
 0.2.2
 ~~~~~
 
