@@ -69,11 +69,16 @@ def get_fixtures(session):
             loc = getlocation(fixturedef.func, curdir)
             if (fixturedef.argname, loc) in seen:
                 continue
+
             seen.add((fixturedef.argname, loc))
 
             module = fixturedef.func.__module__
-            if not module.startswith("_pytest.") \
-                    and not module.startswith("pytest_"):
+
+            if (
+                not module.startswith("_pytest.") and
+                not module.startswith("pytest_") and
+                not ('site-packages' in loc)
+            ):
                 available.append(AvailableFixture(
                     curdir.bestrelpath(loc),
                     fixturedef.argname,

@@ -203,3 +203,37 @@ def test_repeated_fixtures(testdir):
     result = testdir.runpytest('--dup-fixtures')
 
     assert 'someclass_samefixture' in result.stdout.str()
+
+
+def test_should_not_list_fixtures_from_site_packages_directory(
+    testdir,
+    message_template
+):
+    testdir.tmpdir = testdir.mkdir('site-packages')
+
+    testdir.makepyfile(conftest="""
+        import pytest
+
+
+        @pytest.fixture()
+        def conftest_fixture():
+            return 1
+    """)
+
+    testdir.makepyfile("""
+        import pytest
+
+
+        def test_conftest_fixture():
+            assert 1 == 1
+    """)
+
+    result = testdir.runpytest('--dead-fixtures')
+
+    message = message_template.format(
+        'conftest_fixture',
+        'conftest'
+    )
+
+    assert result.ret == 0
+    assert message not in result.stdout.str()
