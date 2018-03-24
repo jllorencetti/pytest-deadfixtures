@@ -1,6 +1,11 @@
 Changelog
 ---------
 
+1.0.0
+~~~~~
+
+* Ignore fixtures from third-party packages
+
 0.3.0
 ~~~~~
 
