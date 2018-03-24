@@ -10,6 +10,7 @@ Maintainers
 Contributors
 ------------
 
-None yet. Why not be the first?
+* Jair Henrique - `@jairhenrique`_
 
 .. _`@jllorencetti`: https://github.com/jllorencetti
+.. _`@jairhenrique`: https://github.com/jairhenrique

@@ -74,3 +74,4 @@ target/
 # Editors
 .idea/
 
+.pytest_cache/
