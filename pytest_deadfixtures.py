@@ -196,4 +196,4 @@ def show_dead_fixtures(config, session):
         )
         write_fixtures(tw, unused_fixtures, verbose)
     else:
-        tw.line('Cool, every declared fixture are being used.', green=True)
+        tw.line('Cool, every declared fixture is being used.', green=True)
