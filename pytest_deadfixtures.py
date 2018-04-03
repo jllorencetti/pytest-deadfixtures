@@ -99,7 +99,7 @@ def get_used_fixturesdefs(session):
             return fixturesdefs
         if not info.name2fixturedefs:
             # this test item does not use any fixtures
-            return fixturesdefs
+            continue
 
         for _, fixturedefs in sorted(info.name2fixturedefs.items()):
             if fixturedefs is None:
