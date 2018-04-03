@@ -247,7 +247,7 @@ def test_do_not_list_fixture_used_after_test_which_does_not_use_fixtures(testdir
         @pytest.fixture()
         def same_file_fixture():
             return 1
-      
+
         def test_no_fixture_used():
             assert True
 
