@@ -206,8 +206,8 @@ def test_repeated_fixtures(testdir):
 
 
 def test_should_not_list_fixtures_from_site_packages_directory(
-        testdir,
-        message_template
+    testdir,
+    message_template
 ):
     testdir.tmpdir = testdir.mkdir('site-packages')
 
@@ -259,7 +259,7 @@ def test_dont_list_fixture_used_after_test_which_does_not_use_fixtures(testdir, 
     result = testdir.runpytest('--dead-fixtures')
     message = message_template.format(
         'same_file_fixture',
-        'est_dont_list_fixture_used_after_test_which_does_not_use_fixtures'
+        'test_dont_list_fixture_used_after_test_which_does_not_use_fixtures'
     )
 
     assert result.ret == 0
