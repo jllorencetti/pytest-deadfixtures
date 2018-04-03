@@ -239,7 +239,7 @@ def test_should_not_list_fixtures_from_site_packages_directory(
     assert message not in result.stdout.str()
 
 
-def test_dont_list_fixture_used_after_test_which_does_not_use_fixtures(testdir, message_template):
+def test_do_not_list_fixture_used_after_test_which_does_not_use_fixtures(testdir, message_template):
     testdir.makepyfile("""
         import pytest
 
@@ -247,10 +247,9 @@ def test_dont_list_fixture_used_after_test_which_does_not_use_fixtures(testdir, 
         @pytest.fixture()
         def same_file_fixture():
             return 1
-            
+      
         def test_no_fixture_used():
             assert True
-
 
         def test_simple(same_file_fixture):
             assert 1 == same_file_fixture
