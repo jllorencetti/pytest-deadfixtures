@@ -1,6 +1,11 @@
 Changelog
 ---------
 
+1.0.1
+~~~~~
+
+* Fix false-positive report of used fixtures caused by a premature return
+
 1.0.0
 ~~~~~
 
