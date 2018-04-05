@@ -263,3 +263,33 @@ def test_dont_list_fixture_used_after_test_which_does_not_use_fixtures(testdir, 
 
     assert result.ret == 0
     assert message not in result.stdout.str()
+
+
+def test_doctest_should_not_result_in_false_positive(testdir, message_template):
+    testdir.makepyfile("""
+        import pytest
+
+
+        @pytest.fixture()
+        def same_file_fixture():
+            return 1
+
+        def something():
+            ''' a doctest in a docstring
+            >>> something()
+            42
+            '''
+            return 42
+
+        def test_simple(same_file_fixture):
+            assert 1 == same_file_fixture
+    """)
+
+    result = testdir.runpytest('--dead-fixtures', '--doctest-modules')
+    message = message_template.format(
+        'same_file_fixture',
+        'test_doctest_should_not_result_in_false_positive'
+    )
+
+    assert result.ret == 0
+    assert message not in result.stdout.str()
