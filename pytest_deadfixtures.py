@@ -96,7 +96,7 @@ def get_used_fixturesdefs(session):
             info = test_function._fixtureinfo
         except AttributeError:
             # doctests items have no _fixtureinfo attribute
-            return fixturesdefs
+            continue
         if not info.name2fixturedefs:
             # this test item does not use any fixtures
             continue
