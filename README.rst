@@ -2,6 +2,10 @@
 pytest-deadfixtures
 ===================
 
+.. image:: https://img.shields.io/badge/patreon-donate-ff69b4.svg
+    :target: https://www.patreon.com/jllorencetti
+    :alt: Donate
+
 .. image:: https://travis-ci.org/jllorencetti/pytest-deadfixtures.svg?branch=master
     :target: https://travis-ci.org/jllorencetti/pytest-deadfixtures
     :alt: See Build Status on Travis CI
