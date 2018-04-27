@@ -1,3 +1,40 @@
+from pytest_deadfixtures import EXIT_CODE_ERROR, EXIT_CODE_SUCCESS
+
+
+def test_error_exit_code_on_dead_fixtures_found(testdir):
+    testdir.makepyfile("""
+            import pytest
+
+
+            @pytest.fixture()
+            def some_fixture():
+                return 1
+        """)
+
+    result = testdir.runpytest('--dead-fixtures')
+
+    assert result.ret == EXIT_CODE_ERROR
+
+
+def test_success_exit_code_on_dead_fixtures_found(testdir):
+    testdir.makepyfile("""
+        import pytest
+
+
+        @pytest.fixture()
+        def some_fixture():
+            return 1
+
+
+        def test_simple(some_fixture):
+            assert 1 == some_fixture
+    """)
+
+    result = testdir.runpytest('--dead-fixtures')
+
+    assert result.ret == EXIT_CODE_SUCCESS
+
+
 def test_dont_list_autouse_fixture(testdir, message_template):
     testdir.makepyfile("""
         import pytest
@@ -18,7 +55,6 @@ def test_dont_list_autouse_fixture(testdir, message_template):
         'test_dont_list_autouse_fixture'
     )
 
-    assert result.ret == 0
     assert message not in result.stdout.str()
 
 
@@ -42,7 +78,6 @@ def test_dont_list_same_file_fixture(testdir, message_template):
         'test_dont_list_same_file_fixture'
     )
 
-    assert result.ret == 0
     assert message not in result.stdout.str()
 
 
@@ -66,7 +101,6 @@ def test_list_same_file_unused_fixture(testdir, message_template):
         'test_list_same_file_unused_fixture'
     )
 
-    assert result.ret == 0
     assert message in result.stdout.str()
 
 
@@ -94,7 +128,6 @@ def test_dont_list_conftest_fixture(testdir, message_template):
         'conftest'
     )
 
-    assert result.ret == 0
     assert message not in result.stdout.str()
 
 
@@ -122,7 +155,6 @@ def test_list_conftest_unused_fixture(testdir, message_template):
         'conftest'
     )
 
-    assert result.ret == 0
     assert message in result.stdout.str()
 
 
@@ -147,7 +179,6 @@ def test_dont_list_decorator_usefixtures(testdir, message_template):
         'test_dont_list_decorator_usefixtures'
     )
 
-    assert result.ret == 0
     assert message not in result.stdout.str()
 
 
@@ -235,7 +266,6 @@ def test_should_not_list_fixtures_from_site_packages_directory(
         'conftest'
     )
 
-    assert result.ret == 0
     assert message not in result.stdout.str()
 
 
@@ -261,7 +291,6 @@ def test_dont_list_fixture_used_after_test_which_does_not_use_fixtures(testdir, 
         'test_dont_list_fixture_used_after_test_which_does_not_use_fixtures'
     )
 
-    assert result.ret == 0
     assert message not in result.stdout.str()
 
 
@@ -291,5 +320,4 @@ def test_doctest_should_not_result_in_false_positive(testdir, message_template):
         'test_doctest_should_not_result_in_false_positive'
     )
 
-    assert result.ret == 0
     assert message not in result.stdout.str()
