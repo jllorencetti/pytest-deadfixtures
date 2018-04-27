@@ -79,6 +79,12 @@ Just run 'pytest' with an extra option '--dup-fixtures', unlike the '--dead-fixt
     You may have some duplicate fixtures:
     Fixture name: someclass_fixture, location: test_repeated_fixtures.py:12
     Fixture name: someclass_samefixture, location: test_repeated_fixtures.py:17
+    
+    
+Projects using it
+-----------------
+
+- `wemake-django-template`_
 
 Contributing
 ------------
@@ -103,3 +109,4 @@ If you encounter any problems, please `file an issue`_ along with a detailed des
 .. _`tox`: https://tox.readthedocs.io/en/latest/
 .. _`pip`: https://pypi.python.org/pypi/pip/
 .. _`PyPI`: https://pypi.python.org/pypi
+.. _`wemake-django-template`: https://github.com/wemake-services/wemake-django-template
