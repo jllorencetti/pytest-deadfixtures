@@ -16,8 +16,10 @@ matrix:
 
 install:
   - pip install tox
+  - pip install .
 
 script:
+  - pytest --dead-fixtures
   - tox -e $TOX_ENV
 
 before_cache:

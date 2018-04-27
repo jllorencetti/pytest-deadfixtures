@@ -10,6 +10,9 @@ import _pytest.config
 import py
 from _pytest.compat import getlocation
 
+EXIT_CODE_ERROR = 11
+EXIT_CODE_SUCCESS = 0
+
 AvailableFixture = namedtuple(
     'AvailableFixture',
     'relpath, argname, fixturedef'
@@ -41,8 +44,9 @@ def pytest_addoption(parser):
 
 def pytest_cmdline_main(config):
     if config.option.deadfixtures:
-        _show_dead_fixtures(config)
-        return 0
+        if _show_dead_fixtures(config):
+            return EXIT_CODE_ERROR
+        return EXIT_CODE_SUCCESS
 
 
 def _show_dead_fixtures(config):
@@ -197,3 +201,4 @@ def show_dead_fixtures(config, session):
         write_fixtures(tw, unused_fixtures, verbose)
     else:
         tw.line('Cool, every declared fixture is being used.', green=True)
+    return unused_fixtures

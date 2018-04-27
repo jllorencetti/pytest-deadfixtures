@@ -1,6 +1,11 @@
 Changelog
 ---------
 
+2.0.0
+~~~~~
+
+* Return non-zero exit code if unused fixtures are detected
+
 1.0.1
 ~~~~~
 
