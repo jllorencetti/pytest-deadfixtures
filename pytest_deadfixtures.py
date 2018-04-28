@@ -10,6 +10,10 @@ import _pytest.config
 import py
 from _pytest.compat import getlocation
 
+DUPLICATE_FIXTURES_HEADLINE = '\n\nYou may have some duplicate fixtures:'
+UNUSED_FIXTURES_FOUND_HEADLINE = 'Hey there, I believe the following fixture(s) are not being used:'
+UNUSED_FIXTURES_NOT_FOUND_HEADLINE = 'Cool, every declared fixture is being used.'
+
 EXIT_CODE_ERROR = 11
 EXIT_CODE_SUCCESS = 0
 
@@ -154,14 +158,11 @@ def pytest_fixture_post_finalizer(fixturedef):
         )
 
 
-def pytest_sessionfinish(session, exitstatus):
-    if exitstatus or not session.config.getvalue('showrepeated'):
-        return exitstatus
-
+def same_fixture(one, two):
     def result_same_type(a, b):
         return isinstance(a.result, type(b.result))
 
-    def equal_result(a, b):
+    def same_result(a, b):
         if not a.result or not b.result:
             return False
         if hasattr(a.result, '__dict__') or hasattr(b.result, '__dict__'):
@@ -171,14 +172,28 @@ def pytest_sessionfinish(session, exitstatus):
     def same_loc(a, b):
         return a.relpath == b.relpath
 
+    return (result_same_type(one, two) and
+            same_result(one, two) and
+            not same_loc(one, two))
+
+
+def pytest_sessionfinish(session, exitstatus):
+    if exitstatus or not session.config.getvalue('showrepeated'):
+        return exitstatus
+
     tw = _pytest.config.create_terminal_writer(session.config)
 
-    tw.line('\n\nYou may have some duplicate fixtures:', red=True)
-    tplt = 'Fixture name: {}, location: {}'
+    duplicated_fixtures = []
     for a, b in combinations(cached_fixtures, 2):
-        if result_same_type(a, b) and equal_result(a, b) and not same_loc(a, b):
-            tw.line(tplt.format(a.fixturedef.argname, a.relpath))
-            tw.line(tplt.format(b.fixturedef.argname, b.relpath))
+        if same_fixture(a, b):
+            duplicated_fixtures.append((a, b))
+
+    if duplicated_fixtures:
+        tw.line(DUPLICATE_FIXTURES_HEADLINE, red=True)
+        msg = 'Fixture name: {}, location: {}'
+        for a, b in duplicated_fixtures:
+            tw.line(msg.format(a.fixturedef.argname, a.relpath))
+            tw.line(msg.format(b.fixturedef.argname, b.relpath))
 
 
 def show_dead_fixtures(config, session):
@@ -194,11 +209,8 @@ def show_dead_fixtures(config, session):
 
     tw.line()
     if unused_fixtures:
-        tw.line(
-            'Hey there, I believe the following fixture(s) are not being used:',
-            red=True
-        )
+        tw.line(UNUSED_FIXTURES_FOUND_HEADLINE, red=True)
         write_fixtures(tw, unused_fixtures, verbose)
     else:
-        tw.line('Cool, every declared fixture is being used.', green=True)
+        tw.line(UNUSED_FIXTURES_NOT_FOUND_HEADLINE, green=True)
     return unused_fixtures

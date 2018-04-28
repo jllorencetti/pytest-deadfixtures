@@ -1,4 +1,8 @@
-from pytest_deadfixtures import EXIT_CODE_ERROR, EXIT_CODE_SUCCESS
+from pytest_deadfixtures import (
+    DUPLICATE_FIXTURES_HEADLINE,
+    EXIT_CODE_ERROR,
+    EXIT_CODE_SUCCESS,
+)
 
 
 def test_error_exit_code_on_dead_fixtures_found(testdir):
@@ -202,7 +206,26 @@ def test_write_docs_when_verbose(testdir):
     assert 'Blabla fixture docs' in result.stdout.str()
 
 
-def test_repeated_fixtures(testdir):
+def test_repeated_fixtures_not_found(testdir):
+    testdir.makepyfile("""
+        import pytest
+
+
+        @pytest.fixture()
+        def some_fixture():
+            return 1
+
+
+        def test_simple(some_fixture):
+            assert 1 == some_fixture
+    """)
+
+    result = testdir.runpytest('--dup-fixtures')
+
+    assert DUPLICATE_FIXTURES_HEADLINE not in result.stdout.str()
+
+
+def test_repeated_fixtures_found(testdir):
     testdir.makepyfile("""
         import pytest
 
@@ -233,6 +256,7 @@ def test_repeated_fixtures(testdir):
 
     result = testdir.runpytest('--dup-fixtures')
 
+    assert DUPLICATE_FIXTURES_HEADLINE in result.stdout.str()
     assert 'someclass_samefixture' in result.stdout.str()
 
 
