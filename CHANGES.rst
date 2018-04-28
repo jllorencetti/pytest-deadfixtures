@@ -1,6 +1,11 @@
 Changelog
 ---------
 
+2.0.1
+~~~~~
+
+* Fix duplicated fixtures headline always being printed
+
 2.0.0
 ~~~~~
 
