@@ -31,6 +31,17 @@ You can install "pytest-deadfixtures" via `pip`_ from `PyPI`_::
 Usage
 -----
 
+Important
+*********
+
+The `--dead-fixtures` option will not run your tests and it's also sensible for errors in the pytest collection step.
+If you are using as part of you CI process the recommended way is to run it after the default test run. For example::
+
+    script:
+      - pytest
+      - pytest --dead-fixtures
+
+
 Listing unused fixtures
 ***********************
 
