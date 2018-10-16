@@ -108,6 +108,40 @@ def test_list_same_file_unused_fixture(testdir, message_template):
     assert message in result.stdout.str()
 
 
+def test_list_same_file_multiple_unused_fixture(testdir, message_template):
+    testdir.makepyfile("""
+        import pytest
+
+
+        @pytest.fixture()
+        def same_file_fixture():
+            return 1
+
+        @pytest.fixture()
+        def plus_same_file_fixture():
+            return 2
+
+
+        def test_simple():
+            assert 1 == 1
+    """)
+
+    result = testdir.runpytest('--dead-fixtures')
+    first = message_template.format(
+        'same_file_fixture',
+        'test_list_same_file_multiple_unused_fixture'
+    )
+    second = message_template.format(
+        'plus_same_file_fixture',
+        'test_list_same_file_multiple_unused_fixture'
+    )
+    output = result.stdout.str()
+
+    assert first in output
+    assert second in output
+    assert output.index(first) < output.index(second)
+
+
 def test_dont_list_conftest_fixture(testdir, message_template):
     testdir.makepyfile(conftest="""
         import pytest
@@ -160,6 +194,39 @@ def test_list_conftest_unused_fixture(testdir, message_template):
     )
 
     assert message in result.stdout.str()
+
+
+def test_list_conftest_multiple_unused_fixture(testdir, message_template):
+    testdir.makepyfile(conftest="""
+        import pytest
+
+
+        @pytest.fixture()
+        def conftest_fixture():
+            return 1
+
+        @pytest.fixture()
+        def plus_conftest_fixture():
+            return 2
+    """)
+
+    testdir.makepyfile("""
+        import pytest
+
+
+        def test_conftest_fixture():
+            assert 1 == 1
+    """)
+
+    result = testdir.runpytest('--dead-fixtures')
+
+    first = message_template.format('conftest_fixture', 'conftest')
+    second = message_template.format('plus_conftest_fixture', 'conftest')
+    output = result.stdout.str()
+
+    assert first in output
+    assert second in output
+    assert output.index(first) < output.index(second)
 
 
 def test_dont_list_decorator_usefixtures(testdir, message_template):
