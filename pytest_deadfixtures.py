@@ -207,6 +207,7 @@ def show_dead_fixtures(config, session):
     unused_fixtures = [fixture for fixture in available_fixtures
                        if fixture.fixturedef not in used_fixtures]
 
+    tw.line()
     if unused_fixtures:
         tw.line(UNUSED_FIXTURES_FOUND_HEADLINE, red=True)
         write_fixtures(tw, unused_fixtures, verbose)
