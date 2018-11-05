@@ -85,9 +85,9 @@ def get_fixtures(session):
             module = fixturedef.func.__module__
 
             if (
-                not module.startswith("_pytest.") and
-                not module.startswith("pytest_") and
-                not ('site-packages' in loc)
+                not module.startswith('_pytest.') and not
+                module.startswith('pytest_') and not
+                ('site-packages' in loc)
             ):
                 available.append(AvailableFixture(
                     curdir.bestrelpath(loc),
@@ -174,9 +174,7 @@ def same_fixture(one, two):
     def same_loc(a, b):
         return a.relpath == b.relpath
 
-    return (result_same_type(one, two) and
-            same_result(one, two) and
-            not same_loc(one, two))
+    return result_same_type(one, two) and same_result(one, two) and not same_loc(one, two)
 
 
 def pytest_sessionfinish(session, exitstatus):
