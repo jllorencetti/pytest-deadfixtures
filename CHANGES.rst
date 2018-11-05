@@ -1,6 +1,12 @@
 Changelog
 ---------
 
+2.1.0
+~~~~~
+
+* Ignore fixtures from `dist-packages`
+* Fix compatibility with latest pytest version
+
 2.0.1
 ~~~~~
 
