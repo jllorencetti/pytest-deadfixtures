@@ -48,6 +48,8 @@ def pytest_addoption(parser):
 
 def pytest_cmdline_main(config):
     if config.option.deadfixtures:
+        config.option.show_fixture_doc = config.option.verbose
+        config.option.verbose = -1
         if _show_dead_fixtures(config):
             return EXIT_CODE_ERROR
         return EXIT_CODE_SUCCESS
@@ -199,7 +201,7 @@ def pytest_sessionfinish(session, exitstatus):
 def show_dead_fixtures(config, session):
     session.perform_collect()
     tw = _pytest.config.create_terminal_writer(config)
-    verbose = config.getvalue('verbose')
+    show_fixture_doc = config.getvalue('show_fixture_doc')
 
     used_fixtures = get_used_fixturesdefs(session)
     available_fixtures = get_fixtures(session)
@@ -210,7 +212,7 @@ def show_dead_fixtures(config, session):
     tw.line()
     if unused_fixtures:
         tw.line(UNUSED_FIXTURES_FOUND_HEADLINE, red=True)
-        write_fixtures(tw, unused_fixtures, verbose)
+        write_fixtures(tw, unused_fixtures, show_fixture_doc)
     else:
         tw.line(UNUSED_FIXTURES_NOT_FOUND_HEADLINE, green=True)
     return unused_fixtures
