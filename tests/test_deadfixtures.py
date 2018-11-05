@@ -1,3 +1,5 @@
+import pytest
+
 from pytest_deadfixtures import (
     DUPLICATE_FIXTURES_HEADLINE,
     EXIT_CODE_ERROR,
@@ -260,11 +262,16 @@ def test_repeated_fixtures_found(testdir):
     assert 'someclass_samefixture' in result.stdout.str()
 
 
-def test_should_not_list_fixtures_from_site_packages_directory(
+@pytest.mark.parametrize('directory', (
+    'site-packages',
+    'dist-packages',
+))
+def test_should_not_list_fixtures_from_unrelated_directories(
     testdir,
-    message_template
+    message_template,
+    directory,
 ):
-    testdir.tmpdir = testdir.mkdir('site-packages')
+    testdir.tmpdir = testdir.mkdir(directory)
 
     testdir.makepyfile(conftest="""
         import pytest
@@ -287,7 +294,7 @@ def test_should_not_list_fixtures_from_site_packages_directory(
 
     message = message_template.format(
         'conftest_fixture',
-        'conftest'
+        '{}/conftest'.format(directory),
     )
 
     assert message not in result.stdout.str()

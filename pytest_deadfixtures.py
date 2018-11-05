@@ -87,7 +87,8 @@ def get_fixtures(session):
             if (
                 not module.startswith('_pytest.') and not
                 module.startswith('pytest_') and not
-                ('site-packages' in loc)
+                ('site-packages' in loc) and not
+                ('dist-packages' in loc)
             ):
                 available.append(AvailableFixture(
                     curdir.bestrelpath(loc),
