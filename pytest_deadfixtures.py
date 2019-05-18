@@ -10,39 +10,35 @@ import _pytest.config
 import py
 from _pytest.compat import getlocation
 
-DUPLICATE_FIXTURES_HEADLINE = '\n\nYou may have some duplicate fixtures:'
-UNUSED_FIXTURES_FOUND_HEADLINE = 'Hey there, I believe the following fixture(s) are not being used:'
-UNUSED_FIXTURES_NOT_FOUND_HEADLINE = 'Cool, every declared fixture is being used.'
+DUPLICATE_FIXTURES_HEADLINE = "\n\nYou may have some duplicate fixtures:"
+UNUSED_FIXTURES_FOUND_HEADLINE = (
+    "Hey there, I believe the following fixture(s) are not being used:"
+)
+UNUSED_FIXTURES_NOT_FOUND_HEADLINE = "Cool, every declared fixture is being used."
 
 EXIT_CODE_ERROR = 11
 EXIT_CODE_SUCCESS = 0
 
-AvailableFixture = namedtuple(
-    'AvailableFixture',
-    'relpath, argname, fixturedef'
-)
+AvailableFixture = namedtuple("AvailableFixture", "relpath, argname, fixturedef")
 
-CachedFixture = namedtuple(
-    'CachedFixture',
-    'fixturedef, relpath, result'
-)
+CachedFixture = namedtuple("CachedFixture", "fixturedef, relpath, result")
 
 
 def pytest_addoption(parser):
-    group = parser.getgroup('deadfixtures')
+    group = parser.getgroup("deadfixtures")
     group.addoption(
-        '--dead-fixtures',
-        action='store_true',
-        dest='deadfixtures',
+        "--dead-fixtures",
+        action="store_true",
+        dest="deadfixtures",
         default=False,
-        help='Show fixtures not being used'
+        help="Show fixtures not being used",
     )
     group.addoption(
-        '--dup-fixtures',
-        action='store_true',
-        dest='showrepeated',
+        "--dup-fixtures",
+        action="store_true",
+        dest="showrepeated",
         default=False,
-        help='Show duplicated fixtures'
+        help="Show duplicated fixtures",
     )
 
 
@@ -57,6 +53,7 @@ def pytest_cmdline_main(config):
 
 def _show_dead_fixtures(config):
     from _pytest.main import wrap_session
+
     return wrap_session(config, show_dead_fixtures)
 
 
@@ -85,16 +82,16 @@ def get_fixtures(session):
             module = fixturedef.func.__module__
 
             if (
-                not module.startswith('_pytest.') and not
-                module.startswith('pytest_') and not
-                ('site-packages' in loc) and not
-                ('dist-packages' in loc)
+                not module.startswith("_pytest.")
+                and not module.startswith("pytest_")
+                and not ("site-packages" in loc)
+                and not ("dist-packages" in loc)
             ):
-                available.append(AvailableFixture(
-                    curdir.bestrelpath(loc),
-                    fixturedef.argname,
-                    fixturedef
-                ))
+                available.append(
+                    AvailableFixture(
+                        curdir.bestrelpath(loc), fixturedef.argname, fixturedef
+                    )
+                )
 
     available.sort()
     return available
@@ -137,9 +134,9 @@ def write_docstring(tw, doc):
 
 def write_fixtures(tw, fixtures, write_docs):
     for fixture in fixtures:
-        tplt = 'Fixture name: {}, location: {}'
+        tplt = "Fixture name: {}, location: {}"
         tw.line(tplt.format(fixture.argname, fixture.relpath))
-        doc = fixture.fixturedef.func.__doc__ or ''
+        doc = fixture.fixturedef.func.__doc__ or ""
         if write_docs and doc:
             write_docstring(tw, doc)
 
@@ -148,15 +145,13 @@ cached_fixtures = []
 
 
 def pytest_fixture_post_finalizer(fixturedef):
-    if hasattr(fixturedef, 'cached_result'):
+    if hasattr(fixturedef, "cached_result"):
         curdir = py.path.local()
         loc = getlocation(fixturedef.func, curdir)
 
         cached_fixtures.append(
             CachedFixture(
-                fixturedef,
-                curdir.bestrelpath(loc),
-                fixturedef.cached_result[0]
+                fixturedef, curdir.bestrelpath(loc), fixturedef.cached_result[0]
             )
         )
 
@@ -168,7 +163,7 @@ def same_fixture(one, two):
     def same_result(a, b):
         if not a.result or not b.result:
             return False
-        if hasattr(a.result, '__dict__') or hasattr(b.result, '__dict__'):
+        if hasattr(a.result, "__dict__") or hasattr(b.result, "__dict__"):
             return a.result.__dict__ == b.result.__dict__
         return a.result == b.result
 
@@ -179,7 +174,7 @@ def same_fixture(one, two):
 
 
 def pytest_sessionfinish(session, exitstatus):
-    if exitstatus or not session.config.getvalue('showrepeated'):
+    if exitstatus or not session.config.getvalue("showrepeated"):
         return exitstatus
 
     tw = _pytest.config.create_terminal_writer(session.config)
@@ -191,7 +186,7 @@ def pytest_sessionfinish(session, exitstatus):
 
     if duplicated_fixtures:
         tw.line(DUPLICATE_FIXTURES_HEADLINE, red=True)
-        msg = 'Fixture name: {}, location: {}'
+        msg = "Fixture name: {}, location: {}"
         for a, b in duplicated_fixtures:
             tw.line(msg.format(a.fixturedef.argname, a.relpath))
             tw.line(msg.format(b.fixturedef.argname, b.relpath))
@@ -200,13 +195,16 @@ def pytest_sessionfinish(session, exitstatus):
 def show_dead_fixtures(config, session):
     session.perform_collect()
     tw = _pytest.config.create_terminal_writer(config)
-    show_fixture_doc = config.getvalue('show_fixture_doc')
+    show_fixture_doc = config.getvalue("show_fixture_doc")
 
     used_fixtures = get_used_fixturesdefs(session)
     available_fixtures = get_fixtures(session)
 
-    unused_fixtures = [fixture for fixture in available_fixtures
-                       if fixture.fixturedef not in used_fixtures]
+    unused_fixtures = [
+        fixture
+        for fixture in available_fixtures
+        if fixture.fixturedef not in used_fixtures
+    ]
 
     tw.line()
     if unused_fixtures:
