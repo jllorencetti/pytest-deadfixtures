@@ -2,9 +2,9 @@
 pytest-deadfixtures
 ===================
 
-.. image:: https://img.shields.io/badge/patreon-donate-ff69b4.svg
-    :target: https://www.patreon.com/jllorencetti
-    :alt: Donate
+.. image:: https://img.shields.io/badge/code%20style-black-000000.svg
+    :target: https://github.com/python/black
+    :alt: Black
 
 .. image:: https://travis-ci.org/jllorencetti/pytest-deadfixtures.svg?branch=master
     :target: https://travis-ci.org/jllorencetti/pytest-deadfixtures
@@ -90,8 +90,8 @@ Just run 'pytest' with an extra option '--dup-fixtures', unlike the '--dead-fixt
     You may have some duplicate fixtures:
     Fixture name: someclass_fixture, location: test_repeated_fixtures.py:12
     Fixture name: someclass_samefixture, location: test_repeated_fixtures.py:17
-    
-    
+
+
 Projects using it
 -----------------
 
