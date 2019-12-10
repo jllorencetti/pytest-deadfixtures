@@ -93,7 +93,7 @@ def get_fixtures(session):
                     )
                 )
 
-    available.sort()
+    available.sort(key=lambda a: a.relpath)
     return available
 
 
