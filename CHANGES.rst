@@ -1,7 +1,7 @@
 Changelog
 ---------
 
-2.2.0
+3.0.0
 ~~~~~
 
 * Fix compatibility with latest pytest version
