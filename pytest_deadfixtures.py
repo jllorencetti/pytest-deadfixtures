@@ -145,7 +145,7 @@ cached_fixtures = []
 
 
 def pytest_fixture_post_finalizer(fixturedef):
-    if hasattr(fixturedef, "cached_result"):
+    if fixturedef.cached_result is not None:
         curdir = py.path.local()
         loc = getlocation(fixturedef.func, curdir)
 
