@@ -1,6 +1,12 @@
 Changelog
 ---------
 
+2.2.0
+~~~~~
+
+* Group fixtures in report
+* Add compatibility with pytest >= 5.4.0
+
 2.1.0
 ~~~~~
 
