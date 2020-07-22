@@ -347,7 +347,7 @@ def test_repeated_fixtures_found(testdir):
     assert "someclass_samefixture" in result.stdout.str()
 
 
-@pytest.mark.parametrize("directory", ("site-packages", "dist-packages"))
+@pytest.mark.parametrize("directory", ("site-packages", "dist-packages", "<string>"))
 def test_should_not_list_fixtures_from_unrelated_directories(
     testdir, message_template, directory
 ):
