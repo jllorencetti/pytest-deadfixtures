@@ -86,6 +86,7 @@ def get_fixtures(session):
                 and not module.startswith("pytest_")
                 and not ("site-packages" in loc)
                 and not ("dist-packages" in loc)
+                and not ("<string>" in loc)
             ):
                 available.append(
                     AvailableFixture(
