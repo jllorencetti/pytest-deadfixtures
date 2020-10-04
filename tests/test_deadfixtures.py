@@ -550,6 +550,7 @@ def test_imported_fixtures(testdir):
     assert "some_unused_fixture" in result.stdout.str()
 
 
+@pytest.mark.xfail(reason="https://github.com/jllorencetti/pytest-deadfixtures/issues/28")
 def test_parameterized_fixture(testdir):
     testdir.makepyfile(
         conftest="""
@@ -576,7 +577,6 @@ def test_parameterized_fixture(testdir):
 
     result = testdir.runpytest("--dead-fixtures")
 
-    # TODO https://github.com/jllorencetti/pytest-deadfixtures/issues/28
-    # Currently these cases ARE recognized as a false positive, whereas they shouldn't be.
+    # Currently these cases are recognized as a false positive, whereas they shouldn't be.
     # Due to the dynamic lookup of the fixture, this is going to be hard to recognize.
-    assert "some_common_fixture" in result.stdout.str()
+    assert "some_common_fixture" not in result.stdout.str()
