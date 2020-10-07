@@ -438,3 +438,145 @@ def test_doctest_should_not_result_in_false_positive(testdir, message_template):
     )
 
     assert message not in result.stdout.str()
+
+
+def test_dont_list_fixture_used_by_another_fixture(testdir, message_template):
+    testdir.makepyfile(
+        """
+        import pytest
+
+
+        @pytest.fixture()
+        def some_fixture():
+            return 1
+
+        @pytest.fixture()
+        def a_derived_fixture(some_fixture):
+            return some_fixture + 1
+
+        def test_something(a_derived_fixture):
+            assert a_derived_fixture == 2
+    """
+    )
+
+    result = testdir.runpytest("--dead-fixtures")
+
+    for fixture_name in ["some_fixture", "a_derived_fixture"]:
+        message = message_template.format(
+            fixture_name, "test_dont_list_fixture_used_by_another_fixture",
+        )
+        assert message not in result.stdout.str()
+
+
+def test_list_derived_fixtures_if_not_used_by_tests(testdir, message_template):
+    testdir.makepyfile(
+        """
+        import pytest
+
+
+        @pytest.fixture()
+        def some_fixture():
+            return 1
+
+        @pytest.fixture()
+        def a_derived_fixture(some_fixture):
+            return some_fixture + 1
+
+        def test_something():
+            assert True
+    """
+    )
+
+    result = testdir.runpytest("--dead-fixtures")
+
+    # although some_fixture is used by a_derived_fixture, since neither are used by a test case,
+    # they should be reported.
+    for fixture_name in ["some_fixture", "a_derived_fixture"]:
+        message = message_template.format(
+            fixture_name, "test_list_derived_fixtures_if_not_used_by_tests",
+        )
+        assert message in result.stdout.str()
+
+
+def test_imported_fixtures(testdir):
+
+    testdir.makepyfile(
+        conftest="""
+        import pytest
+
+        pytest_plugins = [
+            'more_fixtures',
+        ]
+
+        @pytest.fixture
+        def some_common_fixture():
+            return 'ok'
+    """
+    )
+    testdir.makepyfile(
+        more_fixtures="""
+        import pytest
+
+        @pytest.fixture
+        def some_fixture():
+            return 1
+
+        @pytest.fixture
+        def a_derived_fixture(some_fixture):
+            return some_fixture + 1
+
+        @pytest.fixture
+        def some_unused_fixture():
+            return 'nope'
+    """
+    )
+    testdir.makepyfile(
+        """
+        import pytest
+
+        def test_some_common_thing(some_common_fixture):
+            assert True
+
+        def test_some_derived_thing(a_derived_fixture):
+            assert True
+    """
+    )
+
+    result = testdir.runpytest("--dead-fixtures")
+
+    for fixture_name in ["some_fixture", "a_derived_fixture", "some_common_fixture"]:
+        assert fixture_name not in result.stdout.str()
+
+    assert "some_unused_fixture" in result.stdout.str()
+
+
+@pytest.mark.xfail(reason="https://github.com/jllorencetti/pytest-deadfixtures/issues/28")
+def test_parameterized_fixture(testdir):
+    testdir.makepyfile(
+        conftest="""
+        import pytest
+
+        @pytest.fixture
+        def some_common_fixture():
+            return 1
+    """
+    )
+    testdir.makepyfile(
+        """
+        import pytest
+
+        @pytest.fixture(params=['some_common_fixture'])
+        def another_fixture(request)
+            fixture_value = request.getfixturevalue(request.param)
+            return fixture_value + 1
+
+        def test_a_thing(another_fixture):
+            assert another_fixture == 2
+    """
+    )
+
+    result = testdir.runpytest("--dead-fixtures")
+
+    # Currently these cases are recognized as a false positive, whereas they shouldn't be.
+    # Due to the dynamic lookup of the fixture, this is going to be hard to recognize.
+    assert "some_common_fixture" not in result.stdout.str()
