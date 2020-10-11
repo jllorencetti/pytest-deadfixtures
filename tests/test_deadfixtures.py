@@ -463,7 +463,8 @@ def test_dont_list_fixture_used_by_another_fixture(testdir, message_template):
 
     for fixture_name in ["some_fixture", "a_derived_fixture"]:
         message = message_template.format(
-            fixture_name, "test_dont_list_fixture_used_by_another_fixture",
+            fixture_name,
+            "test_dont_list_fixture_used_by_another_fixture",
         )
         assert message not in result.stdout.str()
 
@@ -493,7 +494,8 @@ def test_list_derived_fixtures_if_not_used_by_tests(testdir, message_template):
     # they should be reported.
     for fixture_name in ["some_fixture", "a_derived_fixture"]:
         message = message_template.format(
-            fixture_name, "test_list_derived_fixtures_if_not_used_by_tests",
+            fixture_name,
+            "test_list_derived_fixtures_if_not_used_by_tests",
         )
         assert message in result.stdout.str()
 
