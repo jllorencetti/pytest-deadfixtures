@@ -7,8 +7,8 @@ from pytest_deadfixtures import (
 )
 
 
-def test_error_exit_code_on_dead_fixtures_found(testdir):
-    testdir.makepyfile(
+def test_error_exit_code_on_dead_fixtures_found(pytester):
+    pytester.makepyfile(
         """
             import pytest
 
@@ -19,13 +19,13 @@ def test_error_exit_code_on_dead_fixtures_found(testdir):
         """
     )
 
-    result = testdir.runpytest("--dead-fixtures")
+    result = pytester.runpytest("--dead-fixtures")
 
     assert result.ret == EXIT_CODE_ERROR
 
 
-def test_success_exit_code_on_dead_fixtures_found(testdir):
-    testdir.makepyfile(
+def test_success_exit_code_on_dead_fixtures_found(pytester):
+    pytester.makepyfile(
         """
         import pytest
 
@@ -40,13 +40,13 @@ def test_success_exit_code_on_dead_fixtures_found(testdir):
     """
     )
 
-    result = testdir.runpytest("--dead-fixtures")
+    result = pytester.runpytest("--dead-fixtures")
 
     assert result.ret == EXIT_CODE_SUCCESS
 
 
-def test_dont_list_autouse_fixture(testdir, message_template):
-    testdir.makepyfile(
+def test_dont_list_autouse_fixture(pytester, message_template):
+    pytester.makepyfile(
         """
         import pytest
 
@@ -61,14 +61,14 @@ def test_dont_list_autouse_fixture(testdir, message_template):
     """
     )
 
-    result = testdir.runpytest("--dead-fixtures")
+    result = pytester.runpytest("--dead-fixtures")
     message = message_template.format("autouse_fixture", "test_dont_list_autouse_fixture")
 
     assert message not in result.stdout.str()
 
 
-def test_dont_list_same_file_fixture(testdir, message_template):
-    testdir.makepyfile(
+def test_dont_list_same_file_fixture(pytester, message_template):
+    pytester.makepyfile(
         """
         import pytest
 
@@ -83,7 +83,7 @@ def test_dont_list_same_file_fixture(testdir, message_template):
     """
     )
 
-    result = testdir.runpytest("--dead-fixtures")
+    result = pytester.runpytest("--dead-fixtures")
     message = message_template.format(
         "same_file_fixture", "test_dont_list_same_file_fixture"
     )
@@ -91,8 +91,8 @@ def test_dont_list_same_file_fixture(testdir, message_template):
     assert message not in result.stdout.str()
 
 
-def test_list_same_file_unused_fixture(testdir, message_template):
-    testdir.makepyfile(
+def test_list_same_file_unused_fixture(pytester, message_template):
+    pytester.makepyfile(
         """
         import pytest
 
@@ -107,7 +107,7 @@ def test_list_same_file_unused_fixture(testdir, message_template):
     """
     )
 
-    result = testdir.runpytest("--dead-fixtures")
+    result = pytester.runpytest("--dead-fixtures")
     message = message_template.format(
         "same_file_fixture", "test_list_same_file_unused_fixture"
     )
@@ -115,8 +115,8 @@ def test_list_same_file_unused_fixture(testdir, message_template):
     assert message in result.stdout.str()
 
 
-def test_list_same_file_multiple_unused_fixture(testdir, message_template):
-    testdir.makepyfile(
+def test_list_same_file_multiple_unused_fixture(pytester, message_template):
+    pytester.makepyfile(
         """
         import pytest
 
@@ -135,7 +135,7 @@ def test_list_same_file_multiple_unused_fixture(testdir, message_template):
     """
     )
 
-    result = testdir.runpytest("--dead-fixtures")
+    result = pytester.runpytest("--dead-fixtures")
     first = message_template.format(
         "same_file_fixture", "test_list_same_file_multiple_unused_fixture"
     )
@@ -149,8 +149,8 @@ def test_list_same_file_multiple_unused_fixture(testdir, message_template):
     assert output.index(first) < output.index(second)
 
 
-def test_dont_list_conftest_fixture(testdir, message_template):
-    testdir.makepyfile(
+def test_dont_list_conftest_fixture(pytester, message_template):
+    pytester.makepyfile(
         conftest="""
         import pytest
 
@@ -161,7 +161,7 @@ def test_dont_list_conftest_fixture(testdir, message_template):
     """
     )
 
-    testdir.makepyfile(
+    pytester.makepyfile(
         """
         import pytest
 
@@ -171,14 +171,14 @@ def test_dont_list_conftest_fixture(testdir, message_template):
     """
     )
 
-    result = testdir.runpytest("--dead-fixtures")
+    result = pytester.runpytest("--dead-fixtures")
     message = message_template.format("conftest_fixture", "conftest")
 
     assert message not in result.stdout.str()
 
 
-def test_list_conftest_unused_fixture(testdir, message_template):
-    testdir.makepyfile(
+def test_list_conftest_unused_fixture(pytester, message_template):
+    pytester.makepyfile(
         conftest="""
         import pytest
 
@@ -189,7 +189,7 @@ def test_list_conftest_unused_fixture(testdir, message_template):
     """
     )
 
-    testdir.makepyfile(
+    pytester.makepyfile(
         """
         import pytest
 
@@ -199,14 +199,14 @@ def test_list_conftest_unused_fixture(testdir, message_template):
     """
     )
 
-    result = testdir.runpytest("--dead-fixtures")
+    result = pytester.runpytest("--dead-fixtures")
     message = message_template.format("conftest_fixture", "conftest")
 
     assert message in result.stdout.str()
 
 
-def test_list_conftest_multiple_unused_fixture(testdir, message_template):
-    testdir.makepyfile(
+def test_list_conftest_multiple_unused_fixture(pytester, message_template):
+    pytester.makepyfile(
         conftest="""
         import pytest
 
@@ -221,7 +221,7 @@ def test_list_conftest_multiple_unused_fixture(testdir, message_template):
     """
     )
 
-    testdir.makepyfile(
+    pytester.makepyfile(
         """
         import pytest
 
@@ -231,7 +231,7 @@ def test_list_conftest_multiple_unused_fixture(testdir, message_template):
     """
     )
 
-    result = testdir.runpytest("--dead-fixtures")
+    result = pytester.runpytest("--dead-fixtures")
 
     first = message_template.format("conftest_fixture", "conftest")
     second = message_template.format("plus_conftest_fixture", "conftest")
@@ -242,8 +242,8 @@ def test_list_conftest_multiple_unused_fixture(testdir, message_template):
     assert output.index(first) < output.index(second)
 
 
-def test_dont_list_decorator_usefixtures(testdir, message_template):
-    testdir.makepyfile(
+def test_dont_list_decorator_usefixtures(pytester, message_template):
+    pytester.makepyfile(
         """
         import pytest
 
@@ -259,7 +259,7 @@ def test_dont_list_decorator_usefixtures(testdir, message_template):
     """
     )
 
-    result = testdir.runpytest("--dead-fixtures")
+    result = pytester.runpytest("--dead-fixtures")
     message = message_template.format(
         "decorator_usefixtures", "test_dont_list_decorator_usefixtures"
     )
@@ -267,8 +267,8 @@ def test_dont_list_decorator_usefixtures(testdir, message_template):
     assert message not in result.stdout.str()
 
 
-def test_write_docs_when_verbose(testdir):
-    testdir.makepyfile(
+def test_write_docs_when_verbose(pytester):
+    pytester.makepyfile(
         """
         import pytest
 
@@ -284,13 +284,13 @@ def test_write_docs_when_verbose(testdir):
     """
     )
 
-    result = testdir.runpytest("--dead-fixtures", "-v")
+    result = pytester.runpytest("--dead-fixtures", "-v")
 
     assert "Blabla fixture docs" in result.stdout.str()
 
 
-def test_repeated_fixtures_not_found(testdir):
-    testdir.makepyfile(
+def test_repeated_fixtures_not_found(pytester):
+    pytester.makepyfile(
         """
         import pytest
 
@@ -305,13 +305,13 @@ def test_repeated_fixtures_not_found(testdir):
     """
     )
 
-    result = testdir.runpytest("--dup-fixtures")
+    result = pytester.runpytest("--dup-fixtures")
 
     assert DUPLICATE_FIXTURES_HEADLINE not in result.stdout.str()
 
 
-def test_repeated_fixtures_found(testdir):
-    testdir.makepyfile(
+def test_repeated_fixtures_found(pytester):
+    pytester.makepyfile(
         """
         import pytest
 
@@ -341,7 +341,7 @@ def test_repeated_fixtures_found(testdir):
     """
     )
 
-    result = testdir.runpytest("--dup-fixtures")
+    result = pytester.runpytest("--dup-fixtures")
 
     assert DUPLICATE_FIXTURES_HEADLINE in result.stdout.str()
     assert "someclass_samefixture" in result.stdout.str()
@@ -349,11 +349,11 @@ def test_repeated_fixtures_found(testdir):
 
 @pytest.mark.parametrize("directory", ("site-packages", "dist-packages", "<string>"))
 def test_should_not_list_fixtures_from_unrelated_directories(
-    testdir, message_template, directory
+    pytester, message_template, directory
 ):
-    testdir.tmpdir = testdir.mkdir(directory)
+    pytester.tmpdir = pytester.mkdir(directory)
 
-    testdir.makepyfile(
+    pytester.makepyfile(
         conftest="""
         import pytest
 
@@ -364,7 +364,7 @@ def test_should_not_list_fixtures_from_unrelated_directories(
     """
     )
 
-    testdir.makepyfile(
+    pytester.makepyfile(
         """
         import pytest
 
@@ -374,7 +374,7 @@ def test_should_not_list_fixtures_from_unrelated_directories(
     """
     )
 
-    result = testdir.runpytest("--dead-fixtures")
+    result = pytester.runpytest("--dead-fixtures")
 
     message = message_template.format("conftest_fixture", "{}/conftest".format(directory))
 
@@ -382,9 +382,9 @@ def test_should_not_list_fixtures_from_unrelated_directories(
 
 
 def test_dont_list_fixture_used_after_test_which_does_not_use_fixtures(
-    testdir, message_template
+    pytester, message_template
 ):
-    testdir.makepyfile(
+    pytester.makepyfile(
         """
         import pytest
 
@@ -401,7 +401,7 @@ def test_dont_list_fixture_used_after_test_which_does_not_use_fixtures(
     """
     )
 
-    result = testdir.runpytest("--dead-fixtures")
+    result = pytester.runpytest("--dead-fixtures")
     message = message_template.format(
         "same_file_fixture",
         "test_dont_list_fixture_used_after_test_which_does_not_use_fixtures",
@@ -410,8 +410,8 @@ def test_dont_list_fixture_used_after_test_which_does_not_use_fixtures(
     assert message not in result.stdout.str()
 
 
-def test_doctest_should_not_result_in_false_positive(testdir, message_template):
-    testdir.makepyfile(
+def test_doctest_should_not_result_in_false_positive(pytester, message_template):
+    pytester.makepyfile(
         """
         import pytest
 
@@ -432,7 +432,7 @@ def test_doctest_should_not_result_in_false_positive(testdir, message_template):
     """
     )
 
-    result = testdir.runpytest("--dead-fixtures", "--doctest-modules")
+    result = pytester.runpytest("--dead-fixtures", "--doctest-modules")
     message = message_template.format(
         "same_file_fixture", "test_doctest_should_not_result_in_false_positive"
     )
@@ -440,8 +440,8 @@ def test_doctest_should_not_result_in_false_positive(testdir, message_template):
     assert message not in result.stdout.str()
 
 
-def test_dont_list_fixture_used_by_another_fixture(testdir, message_template):
-    testdir.makepyfile(
+def test_dont_list_fixture_used_by_another_fixture(pytester, message_template):
+    pytester.makepyfile(
         """
         import pytest
 
@@ -459,7 +459,7 @@ def test_dont_list_fixture_used_by_another_fixture(testdir, message_template):
     """
     )
 
-    result = testdir.runpytest("--dead-fixtures")
+    result = pytester.runpytest("--dead-fixtures")
 
     for fixture_name in ["some_fixture", "a_derived_fixture"]:
         message = message_template.format(
@@ -469,8 +469,8 @@ def test_dont_list_fixture_used_by_another_fixture(testdir, message_template):
         assert message not in result.stdout.str()
 
 
-def test_list_derived_fixtures_if_not_used_by_tests(testdir, message_template):
-    testdir.makepyfile(
+def test_list_derived_fixtures_if_not_used_by_tests(pytester, message_template):
+    pytester.makepyfile(
         """
         import pytest
 
@@ -488,7 +488,7 @@ def test_list_derived_fixtures_if_not_used_by_tests(testdir, message_template):
     """
     )
 
-    result = testdir.runpytest("--dead-fixtures")
+    result = pytester.runpytest("--dead-fixtures")
 
     # although some_fixture is used by a_derived_fixture, since neither are used by a test case,
     # they should be reported.
@@ -500,9 +500,9 @@ def test_list_derived_fixtures_if_not_used_by_tests(testdir, message_template):
         assert message in result.stdout.str()
 
 
-def test_imported_fixtures(testdir):
+def test_imported_fixtures(pytester):
 
-    testdir.makepyfile(
+    pytester.makepyfile(
         conftest="""
         import pytest
 
@@ -515,7 +515,7 @@ def test_imported_fixtures(testdir):
             return 'ok'
     """
     )
-    testdir.makepyfile(
+    pytester.makepyfile(
         more_fixtures="""
         import pytest
 
@@ -532,7 +532,7 @@ def test_imported_fixtures(testdir):
             return 'nope'
     """
     )
-    testdir.makepyfile(
+    pytester.makepyfile(
         """
         import pytest
 
@@ -544,7 +544,7 @@ def test_imported_fixtures(testdir):
     """
     )
 
-    result = testdir.runpytest("--dead-fixtures")
+    result = pytester.runpytest("--dead-fixtures")
 
     for fixture_name in ["some_fixture", "a_derived_fixture", "some_common_fixture"]:
         assert fixture_name not in result.stdout.str()
@@ -553,8 +553,8 @@ def test_imported_fixtures(testdir):
 
 
 @pytest.mark.xfail(reason="https://github.com/jllorencetti/pytest-deadfixtures/issues/28")
-def test_parameterized_fixture(testdir):
-    testdir.makepyfile(
+def test_parameterized_fixture(pytester):
+    pytester.makepyfile(
         conftest="""
         import pytest
 
@@ -563,7 +563,7 @@ def test_parameterized_fixture(testdir):
             return 1
     """
     )
-    testdir.makepyfile(
+    pytester.makepyfile(
         """
         import pytest
 
@@ -577,7 +577,7 @@ def test_parameterized_fixture(testdir):
     """
     )
 
-    result = testdir.runpytest("--dead-fixtures")
+    result = pytester.runpytest("--dead-fixtures")
 
     # Currently these cases are recognized as a false positive, whereas they shouldn't be.
     # Due to the dynamic lookup of the fixture, this is going to be hard to recognize.
