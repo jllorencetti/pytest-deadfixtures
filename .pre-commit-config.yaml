@@ -1,6 +1,6 @@
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v3.2.0
+    rev: v3.4.0
     hooks:
       - id: debug-statements
       - id: trailing-whitespace
@@ -22,7 +22,7 @@ repos:
       - id: black
 
   - repo: https://github.com/pre-commit/mirrors-isort
-    rev: v5.6.1
+    rev: v5.6.4
     hooks:
       - id: isort
 

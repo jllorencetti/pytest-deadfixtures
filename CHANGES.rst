@@ -1,6 +1,13 @@
 Changelog
 ---------
 
+3.0.0
+~~~~~
+
+* Change supported pytest version to >= 6.2.0
+* Drop support for Python 3.5
+* Add support for Python 3.8 and 3.9
+
 2.2.1
 ~~~~~
 
