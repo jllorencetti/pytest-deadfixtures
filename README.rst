@@ -6,7 +6,7 @@ pytest-deadfixtures
     :target: https://github.com/python/black
     :alt: Black
 
-.. image:: https://travis-ci.org/jllorencetti/pytest-deadfixtures.svg?branch=master
+.. image:: https://travis-ci.org/jllorencetti/pytest-deadfixtures.svg?branch=main
     :target: https://travis-ci.org/jllorencetti/pytest-deadfixtures
     :alt: See Build Status on Travis CI
 
