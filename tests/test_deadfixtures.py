@@ -3,7 +3,7 @@ import pytest
 from pytest_deadfixtures import (
     DUPLICATE_FIXTURES_HEADLINE,
     EXIT_CODE_ERROR,
-    EXIT_CODE_SUCCESS,
+    EXIT_CODE_SUCCESS, UNUSED_FIXTURES_FOUND_HEADLINE,
 )
 
 
@@ -111,8 +111,10 @@ def test_list_same_file_unused_fixture(pytester, message_template):
     message = message_template.format(
         "same_file_fixture", "test_list_same_file_unused_fixture"
     )
+    output = result.stdout.str()
 
-    assert message in result.stdout.str()
+    assert message in output
+    assert UNUSED_FIXTURES_FOUND_HEADLINE.format(count=1) in output
 
 
 def test_list_same_file_multiple_unused_fixture(pytester, message_template):
@@ -147,6 +149,7 @@ def test_list_same_file_multiple_unused_fixture(pytester, message_template):
     assert first in output
     assert second in output
     assert output.index(first) < output.index(second)
+    assert UNUSED_FIXTURES_FOUND_HEADLINE.format(count=2) in output
 
 
 def test_dont_list_conftest_fixture(pytester, message_template):

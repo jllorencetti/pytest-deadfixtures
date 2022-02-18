@@ -12,7 +12,7 @@ from _pytest.compat import getlocation
 
 DUPLICATE_FIXTURES_HEADLINE = "\n\nYou may have some duplicate fixtures:"
 UNUSED_FIXTURES_FOUND_HEADLINE = (
-    "Hey there, I believe the following fixture(s) are not being used:"
+    "Hey there, I believe the following {count} fixture(s) are not being used:"
 )
 UNUSED_FIXTURES_NOT_FOUND_HEADLINE = "Cool, every declared fixture is being used."
 
@@ -209,7 +209,7 @@ def show_dead_fixtures(config, session):
 
     tw.line()
     if unused_fixtures:
-        tw.line(UNUSED_FIXTURES_FOUND_HEADLINE, red=True)
+        tw.line(UNUSED_FIXTURES_FOUND_HEADLINE.format(count=len(unused_fixtures)), red=True)
         write_fixtures(tw, unused_fixtures, show_fixture_doc)
     else:
         tw.line(UNUSED_FIXTURES_NOT_FOUND_HEADLINE, green=True)
