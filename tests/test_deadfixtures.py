@@ -45,6 +45,36 @@ def test_success_exit_code_on_dead_fixtures_found(pytester):
     assert result.ret == EXIT_CODE_SUCCESS
 
 
+def test_success_exit_code_on_parametrized_fixture_found(pytester):
+    pytester.makepyfile(
+        """
+        import pytest
+
+        not_a_fixture_one = 1
+
+        not_a_fixture_two = 2
+
+        @pytest.fixture()
+        def some_fixture():
+            return 1
+
+        @pytest.fixture()
+        def some_other_fixture():
+            return 2
+
+        @pytest.mark.parametrize('indirect_fixture,indirect_not_a_fixture',
+            [('some_fixture', not_a_fixture_one), ('some_other_fixture', not_a_fixture_two)],
+        )
+        def test_simple(indirect_fixture, indirect_not_a_fixture):
+            assert request.getfixturevalue(indirect_fixture) == indirect_not_a_fixture
+    """
+    )
+
+    result = pytester.runpytest("--dead-fixtures")
+
+    assert result.ret == EXIT_CODE_SUCCESS
+
+
 def test_dont_list_autouse_fixture(pytester, message_template):
     pytester.makepyfile(
         """
@@ -552,8 +582,8 @@ def test_imported_fixtures(pytester):
     assert "some_unused_fixture" in result.stdout.str()
 
 
-@pytest.mark.xfail(reason="https://github.com/jllorencetti/pytest-deadfixtures/issues/28")
 def test_parameterized_fixture(pytester):
+    # If all fixtures are arranged in conftest file it works as expected
     pytester.makepyfile(
         conftest="""
         import pytest
@@ -561,17 +591,15 @@ def test_parameterized_fixture(pytester):
         @pytest.fixture
         def some_common_fixture():
             return 1
-    """
-    )
-    pytester.makepyfile(
-        """
-        import pytest
 
         @pytest.fixture(params=['some_common_fixture'])
         def another_fixture(request)
             fixture_value = request.getfixturevalue(request.param)
             return fixture_value + 1
-
+    """
+    )
+    pytester.makepyfile(
+        """
         def test_a_thing(another_fixture):
             assert another_fixture == 2
     """

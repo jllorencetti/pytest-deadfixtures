@@ -117,6 +117,22 @@ def get_used_fixturesdefs(session):
     return fixturesdefs
 
 
+def get_parametrized_fixtures(session, available_fixtures):
+    params_values = []
+    for test_function in session.items:
+        try:
+            for _, v in test_function.callspec.params.items():
+                params_values.append(v)
+        except AttributeError:
+            continue
+    return [
+        available.fixturedef
+        for available in filter(
+            lambda x: x.fixturedef.argname in params_values, available_fixtures
+        )
+    ]
+
+
 def write_docstring(tw, doc):
     INDENT = "    "
     doc = doc.rstrip()
@@ -200,11 +216,13 @@ def show_dead_fixtures(config, session):
 
     used_fixtures = get_used_fixturesdefs(session)
     available_fixtures = get_fixtures(session)
+    param_fixtures = get_parametrized_fixtures(session, available_fixtures)
 
     unused_fixtures = [
         fixture
         for fixture in available_fixtures
         if fixture.fixturedef not in used_fixtures
+        and fixture.fixturedef not in param_fixtures
     ]
 
     tw.line()
