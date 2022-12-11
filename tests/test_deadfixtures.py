@@ -66,6 +66,11 @@ def test_dont_list_autouse_fixture(pytester, message_template):
 
     assert message not in result.stdout.str()
 
+    result = pytester.runpytest("--used-fixtures")
+    message = message_template.format("autouse_fixture", "test_dont_list_autouse_fixture")
+
+    assert message in result.stdout.str()
+
 
 def test_dont_list_same_file_fixture(pytester, message_template):
     pytester.makepyfile(
@@ -90,6 +95,13 @@ def test_dont_list_same_file_fixture(pytester, message_template):
 
     assert message not in result.stdout.str()
 
+    result = pytester.runpytest("--used-fixtures")
+    message = message_template.format(
+        "same_file_fixture", "test_dont_list_same_file_fixture"
+    )
+
+    assert message in result.stdout.str()
+
 
 def test_list_same_file_unused_fixture(pytester, message_template):
     pytester.makepyfile(
@@ -113,6 +125,13 @@ def test_list_same_file_unused_fixture(pytester, message_template):
     )
 
     assert message in result.stdout.str()
+
+    result = pytester.runpytest("--used-fixtures")
+    message = message_template.format(
+        "same_file_fixture", "test_list_same_file_unused_fixture"
+    )
+
+    assert message not in result.stdout.str()
 
 
 def test_list_same_file_multiple_unused_fixture(pytester, message_template):
@@ -176,6 +195,11 @@ def test_dont_list_conftest_fixture(pytester, message_template):
 
     assert message not in result.stdout.str()
 
+    result = pytester.runpytest("--used-fixtures")
+    message = message_template.format("conftest_fixture", "conftest")
+
+    assert message in result.stdout.str()
+
 
 def test_list_conftest_unused_fixture(pytester, message_template):
     pytester.makepyfile(
@@ -203,6 +227,11 @@ def test_list_conftest_unused_fixture(pytester, message_template):
     message = message_template.format("conftest_fixture", "conftest")
 
     assert message in result.stdout.str()
+
+    result = pytester.runpytest("--used-fixtures")
+    message = message_template.format("conftest_fixture", "conftest")
+
+    assert message not in result.stdout.str()
 
 
 def test_list_conftest_multiple_unused_fixture(pytester, message_template):
@@ -265,6 +294,13 @@ def test_dont_list_decorator_usefixtures(pytester, message_template):
     )
 
     assert message not in result.stdout.str()
+
+    result = pytester.runpytest("--used-fixtures")
+    message = message_template.format(
+        "decorator_usefixtures", "test_dont_list_decorator_usefixtures"
+    )
+
+    assert message in result.stdout.str()
 
 
 def test_write_docs_when_verbose(pytester):
