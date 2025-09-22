@@ -1,6 +1,6 @@
 [tool.black]
 line-length = 90
-target-version = ['py36']
+target-version = ['py38']
 
 [tool.coverage.run]
 branch = true

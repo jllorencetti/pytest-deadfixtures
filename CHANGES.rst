@@ -10,7 +10,7 @@ Changelog
 2.2.1
 ~~~~~
 
-* Support for dinamically generated fixtures
+* Support for dynamically generated fixtures
 
 2.2.0
 ~~~~~
