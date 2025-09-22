@@ -406,7 +406,7 @@ def test_should_not_list_fixtures_from_unrelated_directories(
 
     result = pytester.runpytest("--dead-fixtures")
 
-    message = message_template.format("conftest_fixture", "{}/conftest".format(directory))
+    message = message_template.format("conftest_fixture", f"{directory}/conftest")
 
     assert message not in result.stdout.str()
 

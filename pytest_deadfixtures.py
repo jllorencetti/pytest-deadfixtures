@@ -1,7 +1,8 @@
 """
 Some functions are basically copy n' paste version of code already in pytest.
-Precisely the get_fixtures, get_used_fixturesdefs and write_docstring funtions.
+Precisely the get_fixtures, get_used_fixturesdefs and write_docstring functions.
 """
+
 from collections import namedtuple
 from itertools import combinations
 from textwrap import dedent
@@ -68,7 +69,7 @@ def get_fixtures(session):
     fm = session._fixturemanager
     curdir = py.path.local()
 
-    for argname, fixturedefs in fm._arg2fixturedefs.items():
+    for fixturedefs in fm._arg2fixturedefs.values():
         assert fixturedefs is not None
         if not fixturedefs:
             continue
@@ -84,9 +85,9 @@ def get_fixtures(session):
             if (
                 not module.startswith("_pytest.")
                 and not module.startswith("pytest_")
-                and not ("site-packages" in loc)
-                and not ("dist-packages" in loc)
-                and not ("<string>" in loc)
+                and "site-packages" not in loc
+                and "dist-packages" not in loc
+                and "<string>" not in loc
             ):
                 available.append(
                     AvailableFixture(
@@ -121,7 +122,7 @@ def get_parametrized_fixtures(session, available_fixtures):
     params_values = []
     for test_function in session.items:
         try:
-            for _, v in test_function.callspec.params.items():
+            for v in test_function.callspec.params.values():
                 params_values.append(v)
         except AttributeError:
             continue
