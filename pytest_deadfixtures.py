@@ -228,7 +228,9 @@ def show_dead_fixtures(config, session):
 
     tw.line()
     if unused_fixtures:
-        tw.line(UNUSED_FIXTURES_FOUND_HEADLINE.format(count=len(unused_fixtures)), red=True)
+        tw.line(
+            UNUSED_FIXTURES_FOUND_HEADLINE.format(count=len(unused_fixtures)), red=True
+        )
         write_fixtures(tw, unused_fixtures, show_fixture_doc)
     else:
         tw.line(UNUSED_FIXTURES_NOT_FOUND_HEADLINE, green=True)

@@ -3,7 +3,8 @@ import pytest
 from pytest_deadfixtures import (
     DUPLICATE_FIXTURES_HEADLINE,
     EXIT_CODE_ERROR,
-    EXIT_CODE_SUCCESS, UNUSED_FIXTURES_FOUND_HEADLINE,
+    EXIT_CODE_SUCCESS,
+    UNUSED_FIXTURES_FOUND_HEADLINE,
 )
 
 
@@ -534,7 +535,6 @@ def test_list_derived_fixtures_if_not_used_by_tests(pytester, message_template):
 
 
 def test_imported_fixtures(pytester):
-
     pytester.makepyfile(
         conftest="""
         import pytest
