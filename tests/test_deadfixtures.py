@@ -3,7 +3,8 @@ import pytest
 from pytest_deadfixtures import (
     DUPLICATE_FIXTURES_HEADLINE,
     EXIT_CODE_ERROR,
-    EXIT_CODE_SUCCESS, UNUSED_FIXTURES_FOUND_HEADLINE,
+    EXIT_CODE_SUCCESS,
+    UNUSED_FIXTURES_FOUND_HEADLINE,
 )
 
 
@@ -92,7 +93,9 @@ def test_dont_list_autouse_fixture(pytester, message_template):
     )
 
     result = pytester.runpytest("--dead-fixtures")
-    message = message_template.format("autouse_fixture", "test_dont_list_autouse_fixture")
+    message = message_template.format(
+        "autouse_fixture", "test_dont_list_autouse_fixture"
+    )
 
     assert message not in result.stdout.str()
 
@@ -534,7 +537,6 @@ def test_list_derived_fixtures_if_not_used_by_tests(pytester, message_template):
 
 
 def test_imported_fixtures(pytester):
-
     pytester.makepyfile(
         conftest="""
         import pytest
