@@ -123,7 +123,8 @@ def get_parametrized_fixtures(session, available_fixtures):
     for test_function in session.items:
         try:
             for v in test_function.callspec.params.values():
-                params_values.append(v)
+                if isinstance(v, str):
+                    params_values.append(v)
         except AttributeError:
             continue
     return [

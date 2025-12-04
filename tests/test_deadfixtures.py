@@ -613,3 +613,36 @@ def test_parameterized_fixture(pytester):
     # Currently these cases are recognized as a false positive, whereas they shouldn't be.
     # Due to the dynamic lookup of the fixture, this is going to be hard to recognize.
     assert "some_common_fixture" not in result.stdout.str()
+
+
+def test_parameterized_fixture_complex_objects(pytester):
+    pytester.makepyfile(
+        conftest="""
+        import pytest
+
+        @pytest.fixture
+        def some_fixture():
+            return 1
+        """
+    )
+    pytester.makepyfile(
+        """
+        import pytest
+
+        class Trapped:
+            def __bool__(self):
+                raise ValueError("Object cannot be checked for truthiness")
+
+        class Trap:
+            def __eq__(self, other):
+                return Trapped()
+
+        @pytest.mark.parametrize('input_value,expected', [(Trap(), 2)])
+        def test_a_thing(input_value, expected, some_fixture):
+            assert expected == 2
+    """
+    )
+
+    result = pytester.runpytest("--dead-fixtures")
+
+    assert result.ret == 0, result.stdout.str()
