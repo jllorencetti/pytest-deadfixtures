@@ -19,6 +19,7 @@ Features
 
 * List unused fixtures in your tests
 * List duplicated fixtures
+* Ignore specific fixtures from analysis with @deadfixtures_ignore
 
 
 Installation
@@ -91,6 +92,32 @@ Just run 'pytest' with an extra option '--dup-fixtures', unlike the '--dead-fixt
     Fixture name: someclass_fixture, location: test_repeated_fixtures.py:12
     Fixture name: someclass_samefixture, location: test_repeated_fixtures.py:17
 
+
+Ignoring specific fixtures
+**************************
+
+You can use the `@deadfixtures_ignore` decorator to exclude specific fixtures from the analysis::
+
+    from pytest_deadfixtures import deadfixtures_ignore
+
+    @pytest.fixture
+    @deadfixtures_ignore
+    def intentionally_unused_fixture():
+        """This fixture won't be reported as unused."""
+        return "something"
+
+To see which fixtures are being ignored, use the `--show-ignored-fixtures` option::
+
+    $ pytest --dead-fixtures --show-ignored-fixtures
+    ============================= test session starts ==============================
+    (hidden for brevity)
+
+    No unused fixtures found. Great job!
+
+    Ignored fixtures (1):
+    Fixture name: intentionally_unused_fixture, location: conftest.py:10
+
+    ========================= no tests ran in 0.00 seconds =========================
 
 Projects using it
 -----------------
