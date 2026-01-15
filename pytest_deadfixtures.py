@@ -17,6 +17,9 @@ UNUSED_FIXTURES_FOUND_HEADLINE = (
 )
 UNUSED_FIXTURES_NOT_FOUND_HEADLINE = "Cool, every declared fixture is being used."
 
+IGNORED_FIXTURES_HEADLINE = "Ignored fixture(s) {count}:"
+IGNORED_FIXTURES_ATTR = "_deadfixtures_ignore"
+
 EXIT_CODE_ERROR = 11
 EXIT_CODE_SUCCESS = 0
 
@@ -41,6 +44,12 @@ def pytest_addoption(parser):
         default=False,
         help="Show duplicated fixtures",
     )
+    group.addoption(
+        "--show-ignored-fixtures",
+        action="store_true",
+        default=False,
+        help="Show fixtures ignored with `deadfixtures_ignore` mark",
+    )
 
 
 def pytest_cmdline_main(config):
@@ -61,6 +70,17 @@ def _show_dead_fixtures(config):
 def get_best_relpath(func, curdir):
     loc = getlocation(func, curdir)
     return curdir.bestrelpath(loc)
+
+
+def deadfixtures_ignore(func):
+    """Decorator to mark fixtures that should be ignored by the plugin."""
+    setattr(func, IGNORED_FIXTURES_ATTR, True)
+    return func
+
+
+def is_ignored_fixture(fixturedef):
+    """Check if a fixture is marked as ignored."""
+    return getattr(fixturedef.func, IGNORED_FIXTURES_ATTR, False)
 
 
 def get_fixtures(session):
@@ -214,16 +234,25 @@ def show_dead_fixtures(config, session):
     session.perform_collect()
     tw = _pytest.config.create_terminal_writer(config)
     show_fixture_doc = config.getvalue("show_fixture_doc")
+    show_ignored = config.getvalue("show_ignored_fixtures")
 
     used_fixtures = get_used_fixturesdefs(session)
     available_fixtures = get_fixtures(session)
     param_fixtures = get_parametrized_fixtures(session, available_fixtures)
+
+    # Separate ignored and unused fixtures
+    ignored_fixtures = [
+        fixture
+        for fixture in available_fixtures
+        if is_ignored_fixture(fixture.fixturedef)
+    ]
 
     unused_fixtures = [
         fixture
         for fixture in available_fixtures
         if fixture.fixturedef not in used_fixtures
         and fixture.fixturedef not in param_fixtures
+        and not is_ignored_fixture(fixture.fixturedef)
     ]
 
     tw.line()
@@ -234,4 +263,11 @@ def show_dead_fixtures(config, session):
         write_fixtures(tw, unused_fixtures, show_fixture_doc)
     else:
         tw.line(UNUSED_FIXTURES_NOT_FOUND_HEADLINE, green=True)
+
+    # Show ignored fixtures if requested
+    if show_ignored and ignored_fixtures:
+        tw.line()
+        tw.line(IGNORED_FIXTURES_HEADLINE.format(count=len(ignored_fixtures)), yellow=True)
+        write_fixtures(tw, ignored_fixtures, show_fixture_doc)
+
     return unused_fixtures

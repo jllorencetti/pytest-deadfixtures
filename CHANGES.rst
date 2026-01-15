@@ -1,6 +1,11 @@
 Changelog
 ---------
 
+3.1.0
+~~~~~
+
+* Add `deadfixtures_ignore` decorator to ignore specific fixtures from being reported as unused
+
 3.0.0
 ~~~~~
 

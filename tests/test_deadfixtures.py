@@ -613,3 +613,51 @@ def test_parameterized_fixture(pytester):
     # Currently these cases are recognized as a false positive, whereas they shouldn't be.
     # Due to the dynamic lookup of the fixture, this is going to be hard to recognize.
     assert "some_common_fixture" not in result.stdout.str()
+
+
+def test_ignored_unused_fixture(pytester):
+    pytester.makepyfile(
+        """
+        import pytest
+        from pytest_deadfixtures import deadfixtures_ignore
+
+
+        @pytest.fixture()
+        @deadfixtures_ignore
+        def some_fixture():
+            return 1
+
+
+        def test_simple():
+            assert 1 == 1
+    """
+    )
+
+    result = pytester.runpytest("--dead-fixtures")
+
+    assert "some_fixture" not in result.stdout.str()
+
+
+def test_list_ignored_unused_fixture_when_flagged(pytester, message_template):
+    pytester.makepyfile(
+        """
+        import pytest
+        from pytest_deadfixtures import deadfixtures_ignore
+
+
+        @pytest.fixture()
+        @deadfixtures_ignore
+        def some_fixture():
+            return 1
+
+
+        def test_simple():
+            assert 1 == 1
+    """
+    )
+
+    result = pytester.runpytest("--dead-fixtures", "--show-ignored-fixtures")
+    message = message_template.format(
+        "some_fixture", "test_list_ignored_unused_fixture_when_flagged"
+    )
+    assert message in result.stdout.str()
