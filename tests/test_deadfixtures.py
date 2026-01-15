@@ -93,7 +93,9 @@ def test_dont_list_autouse_fixture(pytester, message_template):
     )
 
     result = pytester.runpytest("--dead-fixtures")
-    message = message_template.format("autouse_fixture", "test_dont_list_autouse_fixture")
+    message = message_template.format(
+        "autouse_fixture", "test_dont_list_autouse_fixture"
+    )
 
     assert message not in result.stdout.str()
 

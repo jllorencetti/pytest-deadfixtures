@@ -208,7 +208,9 @@ def same_fixture(one, two):
     def same_loc(a, b):
         return a.relpath == b.relpath
 
-    return result_same_type(one, two) and same_result(one, two) and not same_loc(one, two)
+    return (
+        result_same_type(one, two) and same_result(one, two) and not same_loc(one, two)
+    )
 
 
 def pytest_sessionfinish(session, exitstatus):
@@ -267,7 +269,9 @@ def show_dead_fixtures(config, session):
     # Show ignored fixtures if requested
     if show_ignored and ignored_fixtures:
         tw.line()
-        tw.line(IGNORED_FIXTURES_HEADLINE.format(count=len(ignored_fixtures)), yellow=True)
+        tw.line(
+            IGNORED_FIXTURES_HEADLINE.format(count=len(ignored_fixtures)), yellow=True
+        )
         write_fixtures(tw, ignored_fixtures, show_fixture_doc)
 
     return unused_fixtures
