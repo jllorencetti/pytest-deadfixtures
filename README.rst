@@ -123,6 +123,7 @@ Projects using it
 -----------------
 
 - `wemake-django-template`_
+- `Федя и Самат django template`_
 
 Contributing
 ------------
@@ -148,3 +149,4 @@ If you encounter any problems, please `file an issue`_ along with a detailed des
 .. _`pip`: https://pypi.python.org/pypi/pip/
 .. _`PyPI`: https://pypi.python.org/pypi
 .. _`wemake-django-template`: https://github.com/wemake-services/wemake-django-template
+.. _`Федя и Самат django template`: https://github.com/fandsdev/django
