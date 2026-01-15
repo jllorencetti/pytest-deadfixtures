@@ -68,7 +68,6 @@ setup(
         "Programming Language :: Python :: Implementation :: CPython",
         "Programming Language :: Python :: Implementation :: PyPy",
         "Operating System :: OS Independent",
-        "License :: OSI Approved :: MIT License",
     ],
     cmdclass={"version": VersionCommand},
     entry_points={"pytest11": ["deadfixtures = pytest_deadfixtures"]},
