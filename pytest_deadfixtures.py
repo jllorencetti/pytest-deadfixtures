@@ -201,7 +201,7 @@ def same_fixture(one, two):
     def same_result(a, b):
         if not a.result or not b.result:
             return False
-        if hasattr(a.result, "__dict__") or hasattr(b.result, "__dict__"):
+        if getattr(a.result, "__dict__", None) and getattr(b.result, "__dict__", None):  
             return a.result.__dict__ == b.result.__dict__
         return a.result == b.result
 
