@@ -182,7 +182,9 @@ def write_fixtures(tw, fixtures, write_docs):
 cached_fixtures = []
 
 
-def pytest_fixture_post_finalizer(fixturedef):
+def pytest_fixture_post_finalizer(fixturedef, request):
+    if not request.config.getvalue("showrepeated"):
+        return
     if getattr(fixturedef, "cached_result", None):
         curdir = py.path.local()
         loc = getlocation(fixturedef.func, curdir)

@@ -383,6 +383,43 @@ def test_repeated_fixtures_found(pytester):
     assert "someclass_samefixture" in result.stdout.str()
 
 
+def test_fixture_values_not_kept_alive_without_dup_fixtures(pytester):
+    pytester.makepyfile(
+        """
+        import gc
+        import weakref
+
+        import pytest
+
+
+        class Payload:
+            pass
+
+
+        refs = []
+
+
+        @pytest.fixture()
+        def payload():
+            obj = Payload()
+            refs.append(weakref.ref(obj))
+            return obj
+
+
+        def test_first(payload):
+            assert payload is not None
+
+        def test_second(payload):
+            gc.collect()
+            assert refs[0]() is None, "previous fixture value is still alive"
+    """
+    )
+
+    result = pytester.runpytest()
+
+    result.assert_outcomes(passed=2)
+
+
 @pytest.mark.parametrize("directory", ("site-packages", "dist-packages", "<string>"))
 def test_should_not_list_fixtures_from_unrelated_directories(
     pytester, message_template, directory
