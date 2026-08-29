@@ -242,6 +242,14 @@ def show_dead_fixtures(config, session):
     available_fixtures = get_fixtures(session)
     param_fixtures = get_parametrized_fixtures(session, available_fixtures)
 
+    curdir = py.path.local()
+
+    def _fixture_key(fixturedef):
+        return fixturedef.argname, getlocation(fixturedef.func, curdir)
+
+    used_keys = {_fixture_key(fixturedef) for fixturedef in used_fixtures}
+    param_keys = {_fixture_key(fixturedef) for fixturedef in param_fixtures}
+
     # Separate ignored and unused fixtures
     ignored_fixtures = [
         fixture
@@ -252,8 +260,8 @@ def show_dead_fixtures(config, session):
     unused_fixtures = [
         fixture
         for fixture in available_fixtures
-        if fixture.fixturedef not in used_fixtures
-        and fixture.fixturedef not in param_fixtures
+        if _fixture_key(fixture.fixturedef) not in used_keys
+        and _fixture_key(fixture.fixturedef) not in param_keys
         and not is_ignored_fixture(fixture.fixturedef)
     ]
 

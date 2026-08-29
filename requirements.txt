@@ -1,5 +1,5 @@
 pre-commit
-pytest
+pytest>=8.1.2
 pytest-cov
 tox
 tox-gh-actions
