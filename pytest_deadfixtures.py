@@ -4,12 +4,13 @@ Precisely the get_fixtures, get_used_fixturesdefs and write_docstring functions.
 """
 
 import os.path
-from collections import namedtuple
 from itertools import combinations
 from pathlib import Path
 from textwrap import dedent
+from typing import Any, NamedTuple
 
 import _pytest.config
+import pytest
 from _pytest.compat import getlocation
 
 DUPLICATE_FIXTURES_HEADLINE = "\n\nYou may have some duplicate fixtures:"
@@ -24,12 +25,20 @@ IGNORED_FIXTURES_ATTR = "_deadfixtures_ignore"
 EXIT_CODE_ERROR = 11
 EXIT_CODE_SUCCESS = 0
 
-AvailableFixture = namedtuple("AvailableFixture", "relpath, argname, fixturedef")
 
-CachedFixture = namedtuple("CachedFixture", "fixturedef, relpath, result")
+class AvailableFixture(NamedTuple):
+    relpath: str
+    argname: str
+    fixturedef: Any
 
 
-def pytest_addoption(parser):
+class CachedFixture(NamedTuple):
+    fixturedef: Any
+    relpath: str
+    result: Any
+
+
+def pytest_addoption(parser: pytest.Parser) -> None:
     group = parser.getgroup("deadfixtures")
     group.addoption(
         "--dead-fixtures",
@@ -53,16 +62,17 @@ def pytest_addoption(parser):
     )
 
 
-def pytest_cmdline_main(config):
+def pytest_cmdline_main(config: pytest.Config) -> int | None:
     if config.option.deadfixtures:
         config.option.show_fixture_doc = config.option.verbose
         config.option.verbose = -1
         if _show_dead_fixtures(config):
             return EXIT_CODE_ERROR
         return EXIT_CODE_SUCCESS
+    return None
 
 
-def _show_dead_fixtures(config):
+def _show_dead_fixtures(config: pytest.Config) -> int | pytest.ExitCode:
     from _pytest.main import wrap_session
 
     return wrap_session(config, show_dead_fixtures)
@@ -109,7 +119,7 @@ def bestrelpath(directory: Path, dest: Path) -> str:
     )
 
 
-def get_best_relpath(func, curdir):
+def get_best_relpath(func, curdir: Path) -> str:
     loc = getlocation(func, str(curdir))
     return bestrelpath(curdir, Path(loc))
 
@@ -120,12 +130,12 @@ def deadfixtures_ignore(func):
     return func
 
 
-def is_ignored_fixture(fixturedef):
+def is_ignored_fixture(fixturedef) -> bool:
     """Check if a fixture is marked as ignored."""
     return getattr(fixturedef.func, IGNORED_FIXTURES_ATTR, False)
 
 
-def get_fixtures(session):
+def get_fixtures(session: pytest.Session) -> list[AvailableFixture]:
     available = []
     seen = set()
     fm = session._fixturemanager
@@ -161,7 +171,7 @@ def get_fixtures(session):
     return available
 
 
-def get_used_fixturesdefs(session):
+def get_used_fixturesdefs(session: pytest.Session):
     fixturesdefs = []
     for test_function in session.items:
         try:
@@ -180,7 +190,9 @@ def get_used_fixturesdefs(session):
     return fixturesdefs
 
 
-def get_parametrized_fixtures(session, available_fixtures):
+def get_parametrized_fixtures(
+    session: pytest.Session, available_fixtures: list[AvailableFixture]
+):
     params_values = []
     for test_function in session.items:
         try:
@@ -196,7 +208,7 @@ def get_parametrized_fixtures(session, available_fixtures):
     ]
 
 
-def write_docstring(tw, doc):
+def write_docstring(tw, doc: str) -> None:
     INDENT = "    "
     doc = doc.rstrip()
     if "\n" in doc:
@@ -212,7 +224,7 @@ def write_docstring(tw, doc):
             tw.write(INDENT + line + "\n")
 
 
-def write_fixtures(tw, fixtures, write_docs):
+def write_fixtures(tw, fixtures, write_docs: bool) -> None:
     for fixture in fixtures:
         tplt = "Fixture name: {}, location: {}"
         tw.line(tplt.format(fixture.argname, fixture.relpath))
@@ -221,7 +233,7 @@ def write_fixtures(tw, fixtures, write_docs):
             write_docstring(tw, doc)
 
 
-cached_fixtures = []
+cached_fixtures: list[CachedFixture] = []
 
 
 def pytest_fixture_post_finalizer(fixturedef):
@@ -236,18 +248,18 @@ def pytest_fixture_post_finalizer(fixturedef):
         )
 
 
-def same_fixture(one, two):
+def same_fixture(one, two) -> bool:
     def result_same_type(a, b):
         return isinstance(a.result, type(b.result))
 
-    def same_result(a, b):
+    def same_result(a, b) -> bool:
         if not a.result or not b.result:
             return False
         if hasattr(a.result, "__dict__") or hasattr(b.result, "__dict__"):
             return a.result.__dict__ == b.result.__dict__
         return a.result == b.result
 
-    def same_loc(a, b):
+    def same_loc(a, b) -> bool:
         return a.relpath == b.relpath
 
     return (
@@ -255,7 +267,7 @@ def same_fixture(one, two):
     )
 
 
-def pytest_sessionfinish(session, exitstatus):
+def pytest_sessionfinish(session: pytest.Session, exitstatus: int | pytest.ExitCode):
     if exitstatus or not session.config.getvalue("showrepeated"):
         return exitstatus
 
@@ -274,7 +286,9 @@ def pytest_sessionfinish(session, exitstatus):
             tw.line(msg.format(b.fixturedef.argname, b.relpath))
 
 
-def show_dead_fixtures(config, session):
+def show_dead_fixtures(
+    config: pytest.Config, session: pytest.Session
+) -> list[AvailableFixture]:
     session.perform_collect()
     tw = _pytest.config.create_terminal_writer(config)
     show_fixture_doc = config.getvalue("show_fixture_doc")
