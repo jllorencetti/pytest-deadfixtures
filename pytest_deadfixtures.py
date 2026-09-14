@@ -3,12 +3,13 @@ Some functions are basically copy n' paste version of code already in pytest.
 Precisely the get_fixtures, get_used_fixturesdefs and write_docstring functions.
 """
 
+import os.path
 from collections import namedtuple
 from itertools import combinations
+from pathlib import Path
 from textwrap import dedent
 
 import _pytest.config
-import py
 from _pytest.compat import getlocation
 
 DUPLICATE_FIXTURES_HEADLINE = "\n\nYou may have some duplicate fixtures:"
@@ -67,9 +68,50 @@ def _show_dead_fixtures(config):
     return wrap_session(config, show_dead_fixtures)
 
 
+def commonpath(path1: Path, path2: Path) -> Path | None:
+    """Return the common part shared with the other path, or None if there is
+    no common part.
+
+    If one path is relative and one is absolute, returns None.
+    """
+    try:
+        return Path(os.path.commonpath((str(path1), str(path2))))
+    except ValueError:
+        return None
+
+
+def bestrelpath(directory: Path, dest: Path) -> str:
+    """Return a string which is a relative path from directory to dest such
+    that directory/bestrelpath == dest.
+
+    The paths must be either both absolute or both relative.
+
+    If no such path can be determined, returns dest.
+    """
+    assert isinstance(directory, Path)
+    assert isinstance(dest, Path)
+    if dest == directory:
+        return os.curdir
+    # Find the longest common directory.
+    base = commonpath(directory, dest)
+    # Can be the case on Windows for two absolute paths on different drives.
+    # Can be the case for two relative paths without common prefix.
+    # Can be the case for a relative path and an absolute path.
+    if not base:
+        return str(dest)
+    reldirectory = directory.relative_to(base)
+    reldest = dest.relative_to(base)
+    return os.path.join(
+        # Back from directory to base.
+        *([os.pardir] * len(reldirectory.parts)),
+        # Forward from base to dest.
+        *reldest.parts,
+    )
+
+
 def get_best_relpath(func, curdir):
-    loc = getlocation(func, curdir)
-    return curdir.bestrelpath(loc)
+    loc = getlocation(func, str(curdir))
+    return bestrelpath(curdir, Path(loc))
 
 
 def deadfixtures_ignore(func):
@@ -87,14 +129,14 @@ def get_fixtures(session):
     available = []
     seen = set()
     fm = session._fixturemanager
-    curdir = py.path.local()
+    curdir = Path.cwd()
 
     for fixturedefs in fm._arg2fixturedefs.values():
         assert fixturedefs is not None
         if not fixturedefs:
             continue
         for fixturedef in fixturedefs:
-            loc = getlocation(fixturedef.func, curdir)
+            loc = getlocation(fixturedef.func, str(curdir))
             if (fixturedef.argname, loc) in seen:
                 continue
 
@@ -111,7 +153,7 @@ def get_fixtures(session):
             ):
                 available.append(
                     AvailableFixture(
-                        curdir.bestrelpath(loc), fixturedef.argname, fixturedef
+                        bestrelpath(curdir, Path(loc)), fixturedef.argname, fixturedef
                     )
                 )
 
@@ -184,12 +226,12 @@ cached_fixtures = []
 
 def pytest_fixture_post_finalizer(fixturedef):
     if getattr(fixturedef, "cached_result", None):
-        curdir = py.path.local()
-        loc = getlocation(fixturedef.func, curdir)
+        curdir = Path.cwd()
+        loc = getlocation(fixturedef.func, str(curdir))
 
         cached_fixtures.append(
             CachedFixture(
-                fixturedef, curdir.bestrelpath(loc), fixturedef.cached_result[0]
+                fixturedef, bestrelpath(curdir, Path(loc)), fixturedef.cached_result[0]
             )
         )
 
