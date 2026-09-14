@@ -7,7 +7,7 @@ import os.path
 from itertools import combinations
 from pathlib import Path
 from textwrap import dedent
-from typing import Any, NamedTuple
+from typing import Any, Iterable, NamedTuple
 
 import _pytest.config
 import _pytest.main
@@ -132,37 +132,45 @@ def is_ignored_fixture(fixturedef) -> bool:
     return getattr(fixturedef.func, IGNORED_FIXTURES_ATTR, False)
 
 
+if pytest.version_tuple < (9, 2, 0):
+
+    def get_all_fixture_defs(session: pytest.Session) -> Iterable[Any]:
+        fm = session._fixturemanager
+        for fixturedefs in fm._arg2fixturedefs.values():
+            yield from fixturedefs
+else:
+
+    def get_all_fixture_defs(session: pytest.Session) -> Iterable[Any]:
+        fm = session._fixturemanager
+        return fm._get_all_fixture_defs()
+
+
 def get_fixtures(session: pytest.Session) -> list[AvailableFixture]:
     available = []
     seen = set()
-    fm = session._fixturemanager
     curdir = Path.cwd()
 
-    for fixturedefs in fm._arg2fixturedefs.values():
-        assert fixturedefs is not None
-        if not fixturedefs:
+    for fixturedef in get_all_fixture_defs(session):
+        loc = getlocation(fixturedef.func, str(curdir))
+        if (fixturedef.argname, loc) in seen:
             continue
-        for fixturedef in fixturedefs:
-            loc = getlocation(fixturedef.func, str(curdir))
-            if (fixturedef.argname, loc) in seen:
-                continue
 
-            seen.add((fixturedef.argname, loc))
+        seen.add((fixturedef.argname, loc))
 
-            module = fixturedef.func.__module__
+        module = fixturedef.func.__module__
 
-            if (
-                not module.startswith("_pytest.")
-                and not module.startswith("pytest_")
-                and "site-packages" not in loc
-                and "dist-packages" not in loc
-                and "<string>" not in loc
-            ):
-                available.append(
-                    AvailableFixture(
-                        bestrelpath(curdir, Path(loc)), fixturedef.argname, fixturedef
-                    )
+        if (
+            not module.startswith("_pytest.")
+            and not module.startswith("pytest_")
+            and "site-packages" not in loc
+            and "dist-packages" not in loc
+            and "<string>" not in loc
+        ):
+            available.append(
+                AvailableFixture(
+                    bestrelpath(curdir, Path(loc)), fixturedef.argname, fixturedef
                 )
+            )
 
     available.sort(key=lambda a: a.relpath)
     return available
