@@ -10,6 +10,7 @@ from textwrap import dedent
 from typing import Any, NamedTuple
 
 import _pytest.config
+import _pytest.main
 import pytest
 from _pytest.compat import getlocation
 
@@ -66,16 +67,12 @@ def pytest_cmdline_main(config: pytest.Config) -> int | None:
     if config.option.deadfixtures:
         config.option.show_fixture_doc = config.option.verbose
         config.option.verbose = -1
-        if _show_dead_fixtures(config):
-            return EXIT_CODE_ERROR
-        return EXIT_CODE_SUCCESS
+        return _show_dead_fixtures(config)
     return None
 
 
 def _show_dead_fixtures(config: pytest.Config) -> int | pytest.ExitCode:
-    from _pytest.main import wrap_session
-
-    return wrap_session(config, show_dead_fixtures)
+    return _pytest.main.wrap_session(config, show_dead_fixtures)
 
 
 def commonpath(path1: Path, path2: Path) -> Path | None:
@@ -236,7 +233,7 @@ def write_fixtures(tw, fixtures, write_docs: bool) -> None:
 cached_fixtures: list[CachedFixture] = []
 
 
-def pytest_fixture_post_finalizer(fixturedef):
+def pytest_fixture_post_finalizer(fixturedef) -> None:
     if getattr(fixturedef, "cached_result", None):
         curdir = Path.cwd()
         loc = getlocation(fixturedef.func, str(curdir))
@@ -267,9 +264,11 @@ def same_fixture(one, two) -> bool:
     )
 
 
-def pytest_sessionfinish(session: pytest.Session, exitstatus: int | pytest.ExitCode):
+def pytest_sessionfinish(
+    session: pytest.Session, exitstatus: int | pytest.ExitCode
+) -> None:
     if exitstatus or not session.config.getvalue("showrepeated"):
-        return exitstatus
+        return
 
     tw = _pytest.config.create_terminal_writer(session.config)
 
@@ -288,7 +287,7 @@ def pytest_sessionfinish(session: pytest.Session, exitstatus: int | pytest.ExitC
 
 def show_dead_fixtures(
     config: pytest.Config, session: pytest.Session
-) -> list[AvailableFixture]:
+) -> int | pytest.ExitCode | None:
     session.perform_collect()
     tw = _pytest.config.create_terminal_writer(config)
     show_fixture_doc = config.getvalue("show_fixture_doc")
@@ -330,4 +329,7 @@ def show_dead_fixtures(
         )
         write_fixtures(tw, ignored_fixtures, show_fixture_doc)
 
-    return unused_fixtures
+    if unused_fixtures:
+        return EXIT_CODE_ERROR
+    else:
+        return EXIT_CODE_SUCCESS
