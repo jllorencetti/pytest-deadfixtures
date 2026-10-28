@@ -46,9 +46,6 @@ build-backend = "hatchling.build"
 [tool.hatch.version]
 source = "vcs"
 
-[tool.hatch.build.targets.wheel]
-only-include = ["pytest_deadfixtures.py"]
-
 [tool.hatch.envs.default]
 python = "3.13"
 dependency-groups = ["dev"]
@@ -73,7 +70,7 @@ dependencies = ["ruff (>=0.14.12)"]
 format = "ruff format ."
 
 [tool.coverage.run]
-source = ["pytest_deadfixtures", "tests"]
+source_pkgs = ["src", "tests"]
 branch = true
 parallel = true
 

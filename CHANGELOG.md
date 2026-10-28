@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Migrated package building and development environments to Hatch.
+- Moved the package implementation into a `src/` layout.
 - Replaced the previous linting tools with Ruff.
 - Converted the README to Markdown and added project status badges.
 
