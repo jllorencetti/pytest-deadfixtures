@@ -2,14 +2,6 @@
 pytest-deadfixtures
 ===================
 
-.. image:: https://img.shields.io/badge/code%20style-black-000000.svg
-    :target: https://github.com/python/black
-    :alt: Black
-
-.. image:: https://travis-ci.org/jllorencetti/pytest-deadfixtures.svg?branch=main
-    :target: https://travis-ci.org/jllorencetti/pytest-deadfixtures
-    :alt: See Build Status on Travis CI
-
 A simple plugin to list unused or duplicated fixtures in a pytest suite.
 
 ----
@@ -126,8 +118,8 @@ Projects using it
 
 Contributing
 ------------
-Contributions are very welcome. Tests can be run with `tox`_, please ensure
-the coverage at least stays the same before you submit a pull request.
+Contributions are very welcome. Run the tests with `hatch test`_ and check
+the code with `hatch check code`_ before submitting a pull request.
 
 License
 -------
@@ -144,7 +136,8 @@ If you encounter any problems, please `file an issue`_ along with a detailed des
 .. _`MIT`: http://opensource.org/licenses/MIT
 .. _`file an issue`: https://github.com/jllorencetti/pytest-deadfixtures/issues
 .. _`pytest`: https://github.com/pytest-dev/pytest
-.. _`tox`: https://tox.readthedocs.io/en/latest/
+.. _`hatch test`: https://hatch.pypa.io/latest/cli/reference/#hatch-test
+.. _`hatch check code`: https://hatch.pypa.io/latest/cli/reference/#hatch-check
 .. _`pip`: https://pypi.python.org/pypi/pip/
 .. _`PyPI`: https://pypi.python.org/pypi
 .. _`wemake-django-template`: https://github.com/wemake-services/wemake-django-template

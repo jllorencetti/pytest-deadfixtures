@@ -21,14 +21,3 @@ repos:
     hooks:
       - id: ruff-check
       - id: ruff-format
-
-  - repo: https://github.com/pycqa/isort
-    rev: 7.0.0
-    hooks:
-      - id: isort
-
-  - repo: https://github.com/pycqa/flake8
-    rev: 7.3.0
-    hooks:
-      - id: flake8
-        args: ['--ignore=E501,W503']

@@ -9,6 +9,26 @@ on:
       - "*"
 
 jobs:
+  lint:
+    name: Run linters
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+
+      - name: Setup Hatch
+        run: pipx install hatch
+
+      - name: Run static analysis
+        run: hatch check code
+
+      - name: Verify formatting
+        run: hatch check fmt
+
   tests:
     name: Python ${{ matrix.python-version }}
     runs-on: ubuntu-latest
@@ -16,17 +36,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version:
-          [
-            "3.10",
-            "3.11",
-            "3.12",
-            "3.13",
-            "3.14",
-            "3.14t",
-            "pypy-3.8",
-            "pypy-3.9",
-          ]
+        python-version: ["3.11", "3.12", "3.13", "3.14", "3.15"]
 
     steps:
       - uses: actions/checkout@v5
@@ -36,16 +46,8 @@ jobs:
           python-version: ${{ matrix.python-version }}
           cache: pip
 
-      - name: Install dependencies
-        run: |
-          pip install -U pip
-          pip install -r requirements.txt
-          pip install .
+      - name: Setup Hatch
+        run: pipx install hatch
 
       - name: Run tests
-        run: |
-          tox
-          pytest --dead-fixtures
-
-      - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v5
+        run: hatch test -i py=${{ matrix.python-version }} --cover --junitxml=junit.xml
