@@ -1,12 +1,15 @@
 [project]
 name = "pytest-deadfixtures"
 description = "A simple plugin to list unused fixtures in pytest"
-readme = "README.rst"
+readme = "README.md"
 requires-python = ">=3.11"
 license = "MIT"
 license-files = ["LICENSE"]
 authors = [{ name = "João Luiz Lorencetti", email = "me@dirtycoder.net" }]
-maintainers = [{ name = "João Luiz Lorencetti", email = "me@dirtycoder.net" }]
+maintainers = [
+  { name = "João Luiz Lorencetti", email = "me@dirtycoder.net" },
+  { name = "Christian Hartung", email = "6785871+hartungstenio@users.noreply.github.com" },
+]
 classifiers = [
   "Development Status :: 5 - Production/Stable",
   "Framework :: Pytest",
