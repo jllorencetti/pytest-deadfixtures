@@ -50,4 +50,4 @@ jobs:
         run: pipx install hatch
 
       - name: Run tests
-        run: hatch test -i py=${{ matrix.python-version }} --cover --junitxml=junit.xml
+        run: hatch test -i py=${{ matrix.python-version }} --cover

@@ -26,7 +26,7 @@ classifiers = [
   "Programming Language :: Python :: Implementation :: PyPy",
   "Operating System :: OS Independent",
 ]
-dependencies = ["pytest>=7.0.0"]
+dependencies = ["pytest>=9.0"]
 dynamic = ["version"]
 
 [project.entry-points.pytest11]
@@ -37,7 +37,7 @@ Issues = "https://github.com/jllorencetti/pytest-deadfixtures/issues"
 Source = "https://github.com/jllorencetti/pytest-deadfixtures"
 
 [dependency-groups]
-dev = ["pre-commit", "pytest", "pytest-cov"]
+dev = ["pre-commit", "pytest>=9.0", "pytest-cov"]
 
 [build-system]
 requires = ["hatch-vcs", "hatchling"]
@@ -55,22 +55,24 @@ dependency-groups = ["dev"]
 
 [[tool.hatch.envs.hatch-test.matrix]]
 python = ["3.11", "3.12", "3.13", "3.14", "3.15"]
+pytest = ["9.0", "9.1", "9.2"]
 
-[tool.hatch.envs.hatch-test.scripts]
-run = "pytest{env:HATCH_TEST_ARGS:} {args}"
-run-cov = "coverage run -m pytest{env:HATCH_TEST_ARGS:} {args}"
-cov-combine = "coverage combine"
-cov-report = "coverage xml"
+[tool.hatch.envs.hatch-test.overrides]
+matrix.pytest.dependencies = [
+  { value = "pytest>=9.0,<9.1", if = ["9.0"] },
+  { value = "pytest>=9.1,<9.2", if = ["9.1"] },
+  { value = "pytest>=9.2,<9.3", if = ["9.2"] },
+]
 
 [tool.hatch.envs.hatch-static-analysis]
 config-path = "none"
-dependencies = ["ruff (>=0.14.12)"]
+dependencies = ["ruff (>=0.17.3)"]
 
 [tool.hatch.envs.hatch-static-analysis.scripts]
 format = "ruff format ."
 
 [tool.coverage.run]
-source_pkgs = ["src", "tests"]
+source_pkgs = ["pytest_deadfixtures", "tests"]
 branch = true
 parallel = true
 
