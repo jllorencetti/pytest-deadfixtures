@@ -14,7 +14,7 @@ classifiers = [
   "Development Status :: 5 - Production/Stable",
   "Framework :: Pytest",
   "Intended Audience :: Developers",
-  "Topic :: Software Development :: Testing",
+  "Operating System :: OS Independent",
   "Programming Language :: Python",
   "Programming Language :: Python :: 3",
   "Programming Language :: Python :: 3.11",
@@ -24,24 +24,37 @@ classifiers = [
   "Programming Language :: Python :: 3.15",
   "Programming Language :: Python :: Implementation :: CPython",
   "Programming Language :: Python :: Implementation :: PyPy",
-  "Operating System :: OS Independent",
+  "Topic :: Software Development :: Testing",
 ]
 dependencies = ["pytest>=9.0"]
 dynamic = ["version"]
-
-[project.entry-points.pytest11]
-deadfixtures = "pytest_deadfixtures.plugin"
 
 [project.urls]
 Issues = "https://github.com/jllorencetti/pytest-deadfixtures/issues"
 Source = "https://github.com/jllorencetti/pytest-deadfixtures"
 
+[project.entry-points.pytest11]
+deadfixtures = "pytest_deadfixtures.plugin"
+
 [dependency-groups]
-dev = ["pre-commit", "pytest>=9.0", "pytest-cov"]
+dev = [
+  "pre-commit",
+  "pytest>=9.0",
+  "pytest-cov",
+  "pytest-github-actions-annotate-failures",
+]
 
 [build-system]
 requires = ["hatch-vcs", "hatchling"]
 build-backend = "hatchling.build"
+
+[tool.coverage.run]
+source_pkgs = ["pytest_deadfixtures", "tests"]
+branch = true
+parallel = true
+
+[tool.coverage.report]
+precision = 2
 
 [tool.hatch.version]
 source = "vcs"
@@ -70,14 +83,6 @@ dependencies = ["ruff (>=0.17.3)"]
 
 [tool.hatch.envs.hatch-static-analysis.scripts]
 format = "ruff format ."
-
-[tool.coverage.run]
-source_pkgs = ["pytest_deadfixtures", "tests"]
-branch = true
-parallel = true
-
-[tool.coverage.report]
-precision = 2
 
 [tool.ruff]
 target-version = "py311"

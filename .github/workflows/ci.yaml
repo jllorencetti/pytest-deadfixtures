@@ -46,8 +46,8 @@ jobs:
           python-version: ${{ matrix.python-version }}
           cache: pip
 
-      - name: Setup Hatch
-        run: pipx install hatch
+      - name: Install Hatch
+        uses: pypa/hatch@install
 
       - name: Run tests
         run: hatch test -i py=${{ matrix.python-version }} --cover
