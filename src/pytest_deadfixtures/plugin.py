@@ -197,14 +197,15 @@ def get_parametrized_fixtures(
     for test_function in session.items:
         try:
             for v in test_function.callspec.params.values():
-                params_values.append(v)
+                if isinstance(v, str):
+                    params_values.append(v)
         except AttributeError:
             continue
+
     return [
         available.fixturedef
-        for available in filter(
-            lambda x: x.fixturedef.argname in params_values, available_fixtures
-        )
+        for available in available_fixtures
+        if available.fixturedef.argname in params_values
     ]
 
 
@@ -276,10 +277,9 @@ def pytest_sessionfinish(
 
     tw = _pytest.config.create_terminal_writer(session.config)
 
-    duplicated_fixtures = []
-    for a, b in combinations(cached_fixtures, 2):
-        if same_fixture(a, b):
-            duplicated_fixtures.append((a, b))
+    duplicated_fixtures = [
+        (a, b) for a, b in combinations(cached_fixtures, 2) if same_fixture(a, b)
+    ]
 
     if duplicated_fixtures:
         tw.line(DUPLICATE_FIXTURES_HEADLINE, red=True)
