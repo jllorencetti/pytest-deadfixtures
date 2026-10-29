@@ -2,7 +2,7 @@
 name = "pytest-deadfixtures"
 description = "A simple plugin to list unused fixtures in pytest"
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.10"
 license = "MIT"
 license-files = ["LICENSE"]
 authors = [{ name = "João Luiz Lorencetti", email = "me@dirtycoder.net" }]
@@ -17,6 +17,7 @@ classifiers = [
   "Operating System :: OS Independent",
   "Programming Language :: Python",
   "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
@@ -67,7 +68,7 @@ dependency-groups = ["dev"]
 dependency-groups = ["dev"]
 
 [[tool.hatch.envs.hatch-test.matrix]]
-python = ["3.11", "3.12", "3.13", "3.14", "3.15", "pypy3.11", "pypy3.12"]
+python = ["3.10", "3.11", "3.12", "3.13", "3.14", "3.15", "pypy3.10", "pypy3.11", "pypy3.12"]
 pytest = ["9.0", "9.1", "9.2"]
 
 [tool.hatch.envs.hatch-test.overrides]
@@ -85,7 +86,7 @@ dependencies = ["ruff (>=0.17.3)"]
 format = "ruff format ."
 
 [tool.ruff]
-target-version = "py311"
+target-version = "py310"
 line-length = 90
 
 [tool.ruff.lint]
