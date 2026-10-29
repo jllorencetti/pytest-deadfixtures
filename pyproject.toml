@@ -30,7 +30,7 @@ dependencies = ["pytest>=9.0"]
 dynamic = ["version"]
 
 [project.entry-points.pytest11]
-deadfixtures = "pytest_deadfixtures"
+deadfixtures = "pytest_deadfixtures.plugin"
 
 [project.urls]
 Issues = "https://github.com/jllorencetti/pytest-deadfixtures/issues"

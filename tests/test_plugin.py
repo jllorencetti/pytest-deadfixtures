@@ -1,6 +1,6 @@
 import pytest
 
-from pytest_deadfixtures import (
+from pytest_deadfixtures.plugin import (
     DUPLICATE_FIXTURES_HEADLINE,
     EXIT_CODE_ERROR,
     EXIT_CODE_SUCCESS,

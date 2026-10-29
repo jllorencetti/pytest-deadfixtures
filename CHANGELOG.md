@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Moved the pytest plugin implementation into `pytest_deadfixtures.plugin`.
 - Migrated package building and development environments to Hatch.
 - Moved the package implementation into a `src/` layout.
 - Set up a Hatch test matrix for pytest 9.0, 9.1, and 9.2 across supported Python versions.
