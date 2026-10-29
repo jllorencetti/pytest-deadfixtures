@@ -7,24 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.0.0] - 2026-10-29
+
 ### Added
 
 - Added support for Python 3.15.
-- Added a GitHub Actions workflow to build distributions and publish them to PyPI when a release is published.
-- Added Christian Hartung (@hartungstenio) as a project maintainer.
 
 ### Changed
 
-- Moved the pytest plugin implementation into `pytest_deadfixtures.plugin`.
-- Migrated package building and development environments to Hatch.
-- Moved the package implementation into a `src/` layout.
-- Set up a Hatch test matrix for pytest 9.0, 9.1, and 9.2 across supported Python versions.
-- Replaced the previous linting tools with Ruff.
-- Converted the README to Markdown and added project status badges.
+- Requires Python 3.10 or later; Python 3.8 and 3.9 are no longer supported.
 
 ### Removed
 
-- Dropped support for pytest 7 and 8.
+- Dropped support for pytest 7 and 8; pytest 9.0 or later is required.
+
+### Fixed
+
+- Fixed duplicate-fixture detection when comparing complex parameter values.
+- Avoided retaining fixture return values when duplicate-fixture detection is disabled.
 
 ## [3.1.0] - 2026-01-15
 
@@ -132,7 +132,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - First release.
 
-[Unreleased]: https://github.com/jllorencetti/pytest-deadfixtures/compare/3.1.0...HEAD
+[Unreleased]: https://github.com/jllorencetti/pytest-deadfixtures/compare/4.0.0...HEAD
+[4.0.0]: https://github.com/jllorencetti/pytest-deadfixtures/compare/3.1.0...4.0.0
 [3.1.0]: https://github.com/jllorencetti/pytest-deadfixtures/compare/3.0.0...3.1.0
 [3.0.0]: https://github.com/jllorencetti/pytest-deadfixtures/compare/2.2.1...3.0.0
 [2.2.1]: https://github.com/jllorencetti/pytest-deadfixtures/compare/2.2.0...2.2.1

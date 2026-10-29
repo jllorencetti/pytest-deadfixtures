@@ -111,6 +111,7 @@ Fixture name: intentionally_unused_fixture, location: conftest.py:10
 ## Projects using it
 
 - [wemake-django-template](https://github.com/wemake-services/wemake-django-template)
+- [fands.dev django template](https://github.com/fandsdev/django)
 
 ## Contributing
 
