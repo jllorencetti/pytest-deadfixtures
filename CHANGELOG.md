@@ -24,7 +24,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
-- Dropped support for Python 3.10.
 - Dropped support for pytest 7 and 8.
 
 ## [3.1.0] - 2026-01-15
