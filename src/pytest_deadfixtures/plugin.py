@@ -7,6 +7,7 @@ import os.path
 from itertools import combinations
 from pathlib import Path
 from textwrap import dedent
+from types import FunctionType
 from typing import Any, Iterable, NamedTuple
 
 import _pytest.config
@@ -237,6 +238,10 @@ def write_fixtures(tw, fixtures, write_docs: bool) -> None:
 cached_fixtures: list[CachedFixture] = []
 
 
+def pytest_sessionstart(session: pytest.Session) -> None:
+    cached_fixtures.clear()
+
+
 def pytest_fixture_post_finalizer(fixturedef, request):
     if not request.config.getvalue("showrepeated"):
         return
@@ -259,8 +264,12 @@ def same_fixture(one, two) -> bool:
     def same_result(a, b) -> bool:
         if not a.result or not b.result:
             return False
-        if hasattr(a.result, "__dict__") or hasattr(b.result, "__dict__"):
-            return a.result.__dict__ == b.result.__dict__
+        if isinstance(a.result, FunctionType):
+            return a.result == b.result
+        a_result_dict = getattr(a.result, "__dict__", None)
+        b_result_dict = getattr(b.result, "__dict__", None)
+        if a_result_dict is not None and b_result_dict is not None:
+            return a_result_dict == b_result_dict
         return a.result == b.result
 
     def same_loc(a, b) -> bool:
