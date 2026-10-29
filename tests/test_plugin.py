@@ -698,3 +698,36 @@ def test_list_ignored_unused_fixture_when_flagged(pytester, message_template):
         "some_fixture", "test_list_ignored_unused_fixture_when_flagged"
     )
     assert message in result.stdout.str()
+
+
+def test_parameterized_fixture_complex_objects(pytester):
+    pytester.makepyfile(
+        conftest="""
+        import pytest
+
+        @pytest.fixture
+        def some_fixture():
+            return 1
+        """
+    )
+    pytester.makepyfile(
+        """
+        import pytest
+
+        class Trapped:
+            def __bool__(self):
+                raise ValueError("Object cannot be checked for truthiness")
+
+        class Trap:
+            def __eq__(self, other):
+                return Trapped()
+
+        @pytest.mark.parametrize('input_value,expected', [(Trap(), 2)])
+        def test_a_thing(input_value, expected, some_fixture):
+            assert expected == 2
+    """
+    )
+
+    result = pytester.runpytest("--dead-fixtures")
+
+    assert result.ret == 0, result.stdout.str()
