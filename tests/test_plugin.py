@@ -731,3 +731,96 @@ def test_parameterized_fixture_complex_objects(pytester):
     result = pytester.runpytest("--dead-fixtures")
 
     assert result.ret == 0, result.stdout.str()
+
+
+def test_callable_fixtures_are_not_reported_as_duplicates(pytester):
+    pytester.makepyfile(
+        """
+        from collections.abc import Callable
+
+        import pytest
+
+
+        class A:
+            x: int
+
+            def __init__(self, x: int) -> None:
+                self.x = x
+
+
+        class B:
+            y: str
+
+            def __init__(self, y: str) -> None:
+                self.y = y
+
+
+        @pytest.fixture
+        def factory_A() -> Callable[[], A]:
+            def inner() -> A:
+                return A(x=1)
+
+            return inner
+
+
+        @pytest.fixture
+        def factory_B() -> Callable[[], B]:
+            def inner() -> B:
+                return B(y="a")
+
+            return inner
+
+
+        def test_factories(factory_A: Callable[[], A], factory_B: Callable[[], B]) -> None:
+            object_a = factory_A()
+            object_b = factory_B()
+            assert object_a.x != object_b.y
+    """
+    )
+
+    result = pytester.runpytest("--dup-fixtures")
+
+    assert DUPLICATE_FIXTURES_HEADLINE not in result.stdout.str()
+
+
+def test_result_without_dict_is_not_compared_by_dict(pytester):
+    pytester.makepyfile(
+        """
+        import pytest
+
+
+        class FixtureValue:
+            def __init__(self, exposes_dict):
+                self.exposes_dict = exposes_dict
+
+            def __getattribute__(self, name):
+                if name == "__dict__" and not object.__getattribute__(
+                    self, "exposes_dict"
+                ):
+                    raise AttributeError(name)
+                return object.__getattribute__(self, name)
+
+
+        @pytest.fixture
+        def first_value():
+            return FixtureValue(True)
+
+
+        @pytest.fixture
+        def second_value():
+            return FixtureValue(False)
+
+
+        def test_first(first_value):
+            pass
+
+
+        def test_second(second_value):
+            pass
+    """
+    )
+
+    result = pytester.runpytest("--dup-fixtures")
+
+    assert result.ret == 0, result.stdout.str()
+    assert DUPLICATE_FIXTURES_HEADLINE not in result.stdout.str()
