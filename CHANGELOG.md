@@ -132,8 +132,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - First release.
 
-[Unreleased]: https://github.com/jllorencetti/pytest-deadfixtures/compare/4.0.0...HEAD
-[4.0.0]: https://github.com/jllorencetti/pytest-deadfixtures/compare/3.1.0...4.0.0
+[Unreleased]: https://github.com/jllorencetti/pytest-deadfixtures/compare/v4.0.0...HEAD
+[4.0.0]: https://github.com/jllorencetti/pytest-deadfixtures/compare/3.1.0...v4.0.0
 [3.1.0]: https://github.com/jllorencetti/pytest-deadfixtures/compare/3.0.0...3.1.0
 [3.0.0]: https://github.com/jllorencetti/pytest-deadfixtures/compare/2.2.1...3.0.0
 [2.2.1]: https://github.com/jllorencetti/pytest-deadfixtures/compare/2.2.0...2.2.1
