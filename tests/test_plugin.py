@@ -1,3 +1,5 @@
+from types import SimpleNamespace
+
 import pytest
 
 from pytest_deadfixtures.plugin import (
@@ -5,6 +7,7 @@ from pytest_deadfixtures.plugin import (
     EXIT_CODE_ERROR,
     EXIT_CODE_SUCCESS,
     UNUSED_FIXTURES_FOUND_HEADLINE,
+    get_used_fixturesdefs,
 )
 
 
@@ -509,6 +512,31 @@ def test_doctest_should_not_result_in_false_positive(pytester, message_template)
     )
 
     assert message not in result.stdout.str()
+
+
+def test_used_fixture_defs_are_listed_once(pytester):
+    pytester.makepyfile(
+        """
+        import pytest
+
+
+        @pytest.fixture()
+        def some_fixture():
+            return 1
+
+
+        def test_first(some_fixture):
+            assert 1 == some_fixture
+
+        def test_second(some_fixture):
+            assert 1 == some_fixture
+    """
+    )
+    items, _ = pytester.inline_genitems()
+
+    used = get_used_fixturesdefs(SimpleNamespace(items=items))
+
+    assert [fixturedef.argname for fixturedef in used].count("some_fixture") == 1
 
 
 def test_dont_list_fixture_used_by_another_fixture(pytester, message_template):

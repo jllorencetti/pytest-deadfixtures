@@ -173,7 +173,7 @@ def get_fixtures(session: pytest.Session) -> list[AvailableFixture]:
 
 
 def get_used_fixturesdefs(session: pytest.Session):
-    fixturesdefs = []
+    fixturesdefs: dict[Any, None] = {}
     for test_function in session.items:
         try:
             info = test_function._fixtureinfo
@@ -184,11 +184,11 @@ def get_used_fixturesdefs(session: pytest.Session):
             # this test item does not use any fixtures
             continue
 
-        for _, fixturedefs in sorted(info.name2fixturedefs.items()):
+        for fixturedefs in info.name2fixturedefs.values():
             if fixturedefs is None:
                 continue
-            fixturesdefs.append(fixturedefs[-1])
-    return fixturesdefs
+            fixturesdefs[fixturedefs[-1]] = None
+    return list(fixturesdefs)
 
 
 def get_parametrized_fixtures(
